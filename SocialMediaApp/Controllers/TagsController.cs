@@ -5,12 +5,12 @@ using SocialMediaApp.Models;
 
 namespace SocialMediaApp.Controllers
 {
-	public class PostsController : Controller
+	public class TagsController : Controller
 	{
         private readonly ApplicationDbContext db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public PostsController(
+        public TagsController(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager
@@ -22,10 +22,7 @@ namespace SocialMediaApp.Controllers
         }
         public IActionResult Index()
 		{
-            var articles = from item in db.Posts
-                           select item;
-            ViewBag.Articole = articles;
-            return View();
+			return View();
 		}
 	}
 }
