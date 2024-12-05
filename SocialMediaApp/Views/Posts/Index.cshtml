@@ -1,0 +1,8 @@
+﻿<h2>Afisare articole</h2>
+<br />
+@foreach (var art in ViewBag.Articole)
+{
+    <p>@art.PostId</p>
+    <p>@art.Continut</p>
+    <p>@art.Locatie</p>
+}
