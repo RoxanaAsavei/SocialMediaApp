@@ -5,7 +5,7 @@ namespace SocialMediaApp.Models
 	public class Post
 	{
         [Key]
-        public int PostId { get; set; }
+        public int Id { get; set; }
 
         public string Continut { get; set; }
 
@@ -13,9 +13,9 @@ namespace SocialMediaApp.Models
 
         public int? TagId { get; set; }
 
-        //public string? UserId { get; set; }
+        public string? UserId { get; set; }
 
-        //public virtual ApplicationUser? User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
     }

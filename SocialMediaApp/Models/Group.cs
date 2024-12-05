@@ -5,7 +5,7 @@ namespace SocialMediaApp.Models
 	public class Group
 	{
 		[Key]
-		public int GroupId { get; set; }
+		public int Id { get; set; }
 		public string Nume { get; set; }
 		public string Descriere { get; set; }
 		public string? Fotografie { get; set; }
