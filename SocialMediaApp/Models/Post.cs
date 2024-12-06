@@ -11,6 +11,8 @@ namespace SocialMediaApp.Models
 
         public string Locatie { get; set; }
 
+        public DateTime Data { get; set; }
+
         public int? TagId { get; set; }
 
         public string? UserId { get; set; }

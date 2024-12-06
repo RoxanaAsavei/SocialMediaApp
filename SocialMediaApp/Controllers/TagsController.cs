@@ -21,8 +21,18 @@ namespace SocialMediaApp.Controllers
             _roleManager = roleManager;
         }
         public IActionResult Index()
-		{
-			return View();
-		}
-	}
+        {
+            var tags = from tag in db.Tags
+                           orderby tag.Denumire
+                           select tag;
+            ViewBag.Tags = tags;
+            return View();
+        }
+        public ActionResult Show(int id)
+        {
+            Tag tag = db.Tags.Find(id);
+            ViewBag.Tag = tag;
+            return View();
+        }
+    }
 }

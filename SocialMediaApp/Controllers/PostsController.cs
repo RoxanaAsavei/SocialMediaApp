@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 
@@ -22,10 +23,23 @@ namespace SocialMediaApp.Controllers
         }
         public IActionResult Index()
 		{
-            var articles = from item in db.Posts
+            var postari = from item in db.Posts
                            select item;
-            ViewBag.Articole = articles;
+            ViewBag.Posts = postari;
             return View();
 		}
+
+		//public IActionResult Show(int id)
+		//{
+		//	Post post = db.Posts.Include("Tag")
+		//				.Include("Comments").Include("User")
+		//				.Include("Comments.User")
+		//				.Where(art => art.Id == id)
+		//			    .First();
+		//	ViewBag.Post = post;
+		//	return View();
+		//}
+
+
 	}
 }

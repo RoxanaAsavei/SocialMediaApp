@@ -1,8 +1,14 @@
-﻿<h2>Afisare articole</h2>
-<br />
-@foreach (var art in ViewBag.Articole)
-{
-    <p>@art.PostId</p>
-    <p>@art.Continut</p>
-    <p>@art.Locatie</p>
+﻿@{
+	ViewBag.Title = "Afisarea articolelor";
 }
+
+
+<h2>@ViewBag.Title</h2>
+<br />
+
+@foreach (SocialMediaApp.Models.Post post in ViewBag.posts)
+{
+	<partial name="PostInfo" model="post"/>
+}
+
+<a href="/Posts/New">Postare noua</a>
