@@ -18,7 +18,8 @@
 </div>
 <hr />
 <br />
-@if (Model?.Comments != null && Model.Comments.Any())
+@* @if (Model?.Comments != null && Model.Comments.Any()) *@
+@try
 {
     @foreach (var comm in Model.Comments)
     {
@@ -68,10 +69,13 @@
         </div>
     }
 }
-else
+catch (Exception ex)
 {
     <p>No comments available.</p>
+    <p>@ex.Message</p> <!-- Display the exception message for debugging purposes -->
 }
+
+@* else *@
 
 <div class="container">
 
