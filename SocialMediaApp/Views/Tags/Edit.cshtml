@@ -1,5 +1,23 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model SocialMediaApp.Models.Tag
+
+
 @{
+    ViewBag.Title = "Editare tag";
 }
+
+<h2>@ViewBag.Title</h2>
+
+
+<form asp-action="Edit" asp-controller="Tags" asp-route-id="@Model.Id" method="post">
+
+    <div class="form-group">
+        <label asp-for="Denumire" class="form-label">Denumire tag</label>
+        <br />
+        <input asp-for="Denumire" class="form-control" />
+    </div>
+
+    <br />
+
+    <button class="btn btn-success" type="submit">Modifică tag</button>
+
+</form>
