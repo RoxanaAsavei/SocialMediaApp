@@ -23,7 +23,7 @@ namespace SocialMediaApp.Models
         [Required(ErrorMessage = "User-ul este obligatorie")]
         public string UserId { get; set; }
 
-        public virtual Tag Tag { get; set; }
+        public virtual Tag? Tag { get; set; }
 
         public virtual ApplicationUser User { get; set; }
 

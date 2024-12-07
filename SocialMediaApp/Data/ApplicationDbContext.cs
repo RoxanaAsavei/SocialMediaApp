@@ -28,6 +28,13 @@ namespace SocialMediaApp.Data
 				.HasForeignKey(c => c.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			// Configure cascade delete for Tag and Post
+			modelBuilder.Entity<Post>()
+				.HasOne(p => p.Tag)
+				.WithMany(t => t.Posts)
+				.HasForeignKey(p => p.TagId)
+				.OnDelete(DeleteBehavior.Cascade);
+
 			// Configure foreign key for Post and User with NO ACTION
 			modelBuilder.Entity<Post>()
 				.HasOne(p => p.User)
