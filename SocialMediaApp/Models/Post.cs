@@ -18,14 +18,16 @@ namespace SocialMediaApp.Models
 
         public DateTime Data { get; set; }
 
-        public int? TagId { get; set; }
+        public int? GroupId { get; set; }
+		public int? TagId { get; set; }
 
         [Required(ErrorMessage = "User-ul este obligatorie")]
         public string UserId { get; set; }
 
         public virtual Tag? Tag { get; set; }
+		public virtual Group? Group { get; set; }
 
-        public virtual ApplicationUser User { get; set; }
+		public virtual ApplicationUser User { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
 
