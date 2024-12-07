@@ -6,4 +6,12 @@
 <h2>@ViewBag.Title</h2>
 <br />
 
-	<partial name="TagInfo" model=@ViewBag.Tag/>
+<partial name="TagInfo" model=@ViewBag.Tag/>
+
+<form method="post" asp-controller="Tags" asp-action="Delete" asp-route-id="@ViewBag.Tag.Id">
+
+	<button class="btn btn-danger" type="submit">Sterge tagul</button>
+
+</form>
+
+<br />

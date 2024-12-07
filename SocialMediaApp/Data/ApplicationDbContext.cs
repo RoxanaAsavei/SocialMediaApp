@@ -25,6 +25,14 @@ namespace SocialMediaApp.Data
 				.WithMany(p => p.Comments)
 				.HasForeignKey(c => c.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<Post>()
+			  .HasOne(p => p.Tag)
+			  .WithMany(t => t.Posts)
+			  .HasForeignKey(p => p.TagId)
+			  .OnDelete(DeleteBehavior.Cascade);
 		}
+
+
 	}
 }

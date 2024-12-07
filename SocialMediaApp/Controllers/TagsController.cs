@@ -34,5 +34,14 @@ namespace SocialMediaApp.Controllers
             ViewBag.Tag = tag;
             return View();
         }
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            Tag tag = db.Tags.Find(id);
+            db.Tags.Remove(tag);
+            TempData["message"] = "Categoria a fost stearsa";
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
     }
 }

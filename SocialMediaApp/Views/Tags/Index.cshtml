@@ -6,9 +6,10 @@
 <h2>@ViewBag.Title</h2>
 <br />
 
-@foreach (SocialMediaApp.Models.Tag tag in @ViewBag.Tags)
+@foreach (SocialMediaApp.Models.Tag tag in ViewBag.Tags)
 {
 	<partial name="TagInfo" model="tag" />
+	<a href="/Tags/Show/@tag.Id">Detalii</a>
 }
 
 <a href="/Tags/New">Tag nou</a>
