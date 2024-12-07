@@ -1,9 +1,116 @@
-﻿<h1>Detalii postare</h1>
-<br />
-<hr />
-<br />
-<partial name="PostInfo" model="@ViewBag.post" />
-<br />
-<hr />
-<button type="submit"> <a href="/Posts/Index">Inapoi</a></button>
+﻿@model SocialMediaApp.Models.Post
 
+<h1>Detalii postare</h1>
+<br />
+<hr />
+<br />
+<partial name="PostInfo" model="Model" />
+<br />
+<hr />
+<div class="d-flex flex-row justify-content-between">
+
+    <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">
+
+        <button class="btn btn-danger" type="submit">Sterge postarea</button>
+
+    </form>
+
+</div>
+<hr />
+<br />
+@if (Model?.Comments != null && Model.Comments.Any())
+{
+    @foreach (var comm in Model.Comments)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2"></div>
+
+                <div class="col-md-8">
+
+                    <div>
+
+                        <p>@comm.Continut</p>
+                        <small>@comm.Data</small>
+                        <strong><i class="bi bi-person">@comm.User.UserName</i></strong>
+                    </div>
+                    <br>
+
+                    <div class="d-flex">
+
+                        <div>
+
+                            <a class="btn btn-outline-primary" asp-controller="Comments" asp-action="Edit" asp-route-id="@comm.Id">
+                                <i class="bi bi-pencil-square"></i> Editeaza
+                            </a>
+
+                        </div>
+
+                        <div>
+
+                            <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comm.Id">
+
+                                <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i>Sterge</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    <br />
+
+                </div>
+
+                <div class="col-md-2"></div>
+
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>No comments available.</p>
+}
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-md-2"></div>
+
+        <div class="col-md-8">
+
+            <div class="card">
+
+                <form method="post" asp-controller="Posts" asp-action="Show">
+
+                    <div class="card-body">
+
+                        <input type="hidden" name="PostId" value="@Model.Id" />
+
+                        <label>Continut comentariu</label>
+                        <br />
+
+                        <textarea class="form-control" name="Continut"></textarea>
+
+                        <span asp-validation-for="Continut" class="text-danger"></span>
+                        <br /><br />
+
+                        <button class="btn btn-success " type="submit">Adauga comentariul</button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-2"></div>
+
+    </div>
+
+</div>
+
+<button type="submit"> <a href="/Posts/Index">Inapoi</a></button>

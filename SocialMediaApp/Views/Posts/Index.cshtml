@@ -1,5 +1,5 @@
 ﻿@{
-	ViewBag.Title = "Afisarea articolelor";
+	ViewBag.Title = "Afisarea postarilor";
 }
 
 
@@ -9,6 +9,8 @@
 @foreach (SocialMediaApp.Models.Post post in ViewBag.posts)
 {
 	<partial name="PostInfo" model="post"/>
+	<a href="/Posts/Show/@post.Id">Vezi mai mult</a>
 }
+
 
 <a href="/Posts/New">Postare noua</a>

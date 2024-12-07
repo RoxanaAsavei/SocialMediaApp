@@ -16,5 +16,15 @@ namespace SocialMediaApp.Data
         public DbSet<Group> Groups { get; set; }
 		public DbSet<UserGroup> UserGroups { get; set; }
 
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<Comment>()
+				.HasOne(c => c.Post)
+				.WithMany(p => p.Comments)
+				.HasForeignKey(c => c.PostId)
+				.OnDelete(DeleteBehavior.Cascade);
+		}
 	}
 }
