@@ -5,21 +5,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
+using System.Net.NetworkInformation;
 
 namespace SocialMediaApp.Controllers
 {
 	public class PostsController : Controller
 	{
         private readonly ApplicationDbContext db;
-        private readonly UserManager<ApplicationUser> _userManager;
+		private readonly IWebHostEnvironment _env;
+		private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         public PostsController(
         ApplicationDbContext context,
-        UserManager<ApplicationUser> userManager,
+		IWebHostEnvironment env,
+		UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager
         )
         {
             db = context;
+			_env = env;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -113,24 +117,89 @@ namespace SocialMediaApp.Controllers
 			post.Tags = GetAllTags();
 			return View(post);
 		}
+		//[HttpPost]
+		//public IActionResult New(Post post)
+		//{
+		//	post.Data = DateTime.Now;
+		//	post.UserId = _userManager.GetUserId(User);
+		//	try
+		//	{
+		//		db.Posts.Add(post);
+		//		db.SaveChanges();
+		//		TempData["message"] = "Articolul a fost adaugat";
+		//		return RedirectToAction("Index");
+		//	}
+		//	catch (Exception)
+		//	{
+		//		post.Tags = GetAllTags();
+		//		return View(post);
+		//	}
+		//}
+
 		[HttpPost]
-		public IActionResult New(Post post)
+		public async Task<IActionResult> New(Post post, IFormFile Image)
 		{
-			post.Data = DateTime.Now;
-			post.UserId = _userManager.GetUserId(User);
-			try
+			if (!User.Identity.IsAuthenticated)
 			{
-				db.Posts.Add(post);
-				db.SaveChanges();
-				TempData["message"] = "Articolul a fost adaugat";
-				return RedirectToAction("Index");
-			}
-			catch (Exception)
-			{
+				ModelState.AddModelError("UserId", "User must be logged in to create a post.");
 				post.Tags = GetAllTags();
 				return View(post);
 			}
+
+			post.Data = DateTime.Now;
+			post.UserId = _userManager.GetUserId(User);
+
+			if (string.IsNullOrEmpty(post.UserId))
+			{
+				ModelState.AddModelError("UserId", "Unable to determine the user ID.");
+				post.Tags = GetAllTags();
+				return View(post);
+			}
+
+			if (post.TagId == null)
+			{
+				ModelState.AddModelError("TagId", "Tag is required.");
+				post.Tags = GetAllTags();
+				return View(post);
+			}
+
+			if (Image != null && Image.Length > 0)
+			{
+				// Verificăm extensia
+				var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
+				var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+				if (!allowedExtensions.Contains(fileExtension))
+				{
+					ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
+					post.Tags = GetAllTags();
+					return View(post);
+				}
+
+				// Cale stocare
+				var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
+				var databaseFileName = "/images/" + Image.FileName;
+
+				// Salvare fișier
+				using (var fileStream = new FileStream(storagePath, FileMode.Create))
+				{
+					await Image.CopyToAsync(fileStream);
+				}
+				ModelState.Remove(nameof(post.Image));
+				post.Image = databaseFileName;
+			}
+			if (TryValidateModel(post))
+			{
+				// Adăugare articol
+				db.Posts.Add(post);
+				await db.SaveChangesAsync();
+				// Redirecționare după succes
+				return RedirectToAction("Index", "Posts");
+			}
+			post.Tags = GetAllTags();
+			return View(post);
 		}
+
+
 
 		//delete - cu post
 		[HttpPost]

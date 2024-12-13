@@ -16,22 +16,23 @@ namespace SocialMediaApp.Models
 		[StringLength(50, ErrorMessage = "Locatia nu poate avea mai mult de 50 de caractere")]
 		public string Locatie { get; set; }
 
-        public DateTime Data { get; set; }
+		public string? Image { get; set; }
+
+		public DateTime Data { get; set; }
 
         public int? GroupId { get; set; }
 		public int? TagId { get; set; }
 
-        [Required(ErrorMessage = "User-ul este obligatorie")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         public virtual Tag? Tag { get; set; }
 		public virtual Group? Group { get; set; }
 
-		public virtual ApplicationUser User { get; set; }
+		public virtual ApplicationUser? User { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
 
         [NotMapped]
-		public IEnumerable<SelectListItem> Tags { get; set; }
+		public IEnumerable<SelectListItem>? Tags { get; set; }
 	}
 }
