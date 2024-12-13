@@ -1,0 +1,71 @@
+﻿@model SocialMediaApp.Models.Group
+
+<h1>Detalii despre grup</h1>
+<br />
+<hr />
+<br />
+<div class="card-body">
+
+    <h3 class="card-title alert-success py-3 px-3 rounded-2">
+        @Model.Id
+    </h3>
+
+    <div class="card-text">@Model.Nume</div>
+    <div class="d-flex justify-content-between flex-row mt-5">
+        <span class="alert-success">@Model.Descriere</span>
+    </div>
+    <div class="d-flex justify-content-between flex-row mt-5">
+        <span class="alert-success">@Model.Fotografie</span>
+    </div>
+</div>
+<br />
+<hr />
+<div class="d-flex flex-row justify-content-between">
+
+    <form method="group" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
+
+        <button class="btn btn-danger" type="submit">Sterge grup</button>
+
+    </form>
+
+</div>
+<hr />
+<br />
+@* @if (Model?.Comments != null && Model.Comments.Any()) *@
+@try
+{
+    @foreach (var post in Model.Posts)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2"></div>
+
+                <div class="col-md-8">
+
+                    <div>
+
+                        <p>@post.Continut</p>
+                        <small>@post.Data</small>
+                        <strong><i class="bi bi-person">@post.UserId</i></strong>
+                        <br />
+                        <a href="/Posts/Show/@post.Id">Vezi mai multe detalii despre postare</a>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+}
+catch (Exception ex)
+{
+    <p>No posts available.</p>
+    <p>@ex.Message</p> <!-- Display the exception message for debugging purposes -->
+}
+
+@* else *@
+
+<button type="submit"> <a href="/Groups/Index">Vizualizeaza toti utilizatorii din grup</a></button>
+<br />
+<br />
+<button type="submit"> <a href="/Groups/Index">Inapoi</a></button>
