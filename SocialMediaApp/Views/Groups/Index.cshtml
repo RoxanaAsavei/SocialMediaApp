@@ -1,0 +1,33 @@
+﻿﻿@{
+    ViewBag.Title = "Afisarea grupurilor";
+}
+
+
+<h2>@ViewBag.Title</h2>
+<br />
+
+@foreach (SocialMediaApp.Models.Group group in ViewBag.Groups)
+{
+    <div class="card-body">
+
+        <h3 class="card-title alert-success py-3 px-3 rounded-2">
+            @group.Id
+        </h3>
+
+        <div class="card-text">@group.Nume</div>
+        <div class="d-flex justify-content-between flex-row mt-5">
+            <span class="alert-success">@group.Descriere</span>
+        </div>
+        <div class="d-flex justify-content-between flex-row mt-5">
+            <span class="alert-success">@group.Fotografie</span>
+        </div>
+    </div>
+    <a href="/Groups/Show/@group.Id">Vezi mai mult</a>
+    <br />
+    <a href="/Groups/Edit/@group.Id">Editare grup</a>
+}
+
+<br />
+<br />
+
+<a href="/Groups/New">Grup nou</a>

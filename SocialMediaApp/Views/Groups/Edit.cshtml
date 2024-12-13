@@ -1,0 +1,38 @@
+﻿@model SocialMediaApp.Models.Group
+
+
+@{
+    ViewBag.Title = "Editare grup";
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+<form asp-action="Edit" asp-controller="Groups" asp-route-id="@Model.Id" method="post">
+
+    <div class="form-group">
+        <label asp-for="Nume" class="form-label">Denumire grup</label>
+        <br />
+        <input asp-for="Nume" class="form-control" />
+        <span asp-validation-for="Nume" class="text-danger"></span>
+
+        <br />
+
+        <label asp-for="Descriere" class="form-label">Descriere grup</label>
+        <br />
+        <input asp-for="Descriere" class="form-control" />
+        <span asp-validation-for="Descriere" class="text-danger"></span>
+
+        <br />
+
+        <label asp-for="Fotografie" class="form-label">Fotografie grup</label>
+        <br />
+        <input asp-for="Fotografie" class="form-control" />
+        <span asp-validation-for="Fotografie" class="text-danger"></span>
+    </div>
+
+    <br />
+
+    <button class="btn btn-success" type="submit">Modifică grupul</button>
+
+</form>
