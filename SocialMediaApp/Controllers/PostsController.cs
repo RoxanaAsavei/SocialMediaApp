@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using Ganss.Xss;
+using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -28,12 +29,56 @@ namespace SocialMediaApp.Controllers
             _roleManager = roleManager;
         }
         public IActionResult Index()
-		{
-            var postari = from item in db.Posts
-                           select item;
-            ViewBag.Posts = postari;
+        {
+            var postari = db.Posts.Include("Comments")
+                                    .Include("Tag")
+                                    .Include("User")
+                                    .OrderByDescending(a => a.Data);
+
+            var search = HttpContext.Request.Query["search"].ToString().Trim();
+            if (!string.IsNullOrEmpty(search))
+            {
+                List<int> postIds = db.Posts.Where(at => at.Continut.Contains(search)).Select(a => a.Id).ToList();
+                List<int> articleIdsOfCommentsWithSearchString = db.Comments
+                    .Where(c => c.Continut.Contains(search))
+                    .Select(c => (int)c.PostId).ToList();
+                List<int> mergedIds = postIds.Union(articleIdsOfCommentsWithSearchString).ToList();
+                postari = db.Posts.Where(postare => mergedIds.Contains(postare.Id))
+                                  .Include("Comments")
+                                  .Include("Tag")
+                                  .Include("User")
+                                  .OrderByDescending(a => a.Data);
+            }
+
+            ViewBag.SearchString = search;
+
+            int _perPage = 3;
+            int totalItems = postari.Count();
+            int currentPage = 1;
+            if (int.TryParse(HttpContext.Request.Query["page"], out int page))
+            {
+                currentPage = page;
+            }
+
+            var offset = (currentPage - 1) * _perPage;
+            var paginatedArticles = postari.Skip(offset).Take(_perPage);
+
+            ViewBag.lastPage = Math.Ceiling((float)totalItems / _perPage);
+            ViewBag.CurrentPage = currentPage;
+            ViewBag.Posts = paginatedArticles;
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                ViewBag.PaginationBaseUrl = $"/Posts/Index?search={search}&page=";
+            }
+            else
+            {
+                ViewBag.PaginationBaseUrl = "/Posts/Index?page=";
+            }
+
             return View();
-		}
+        }
+
 
         public IActionResult Details(int id)
         {
@@ -90,11 +135,13 @@ namespace SocialMediaApp.Controllers
 	   [HttpPost]
 		public IActionResult Edit(int id, Post requestPost)
 		{
-			Post post = db.Posts.Find(id);
+            var sanitizer = new HtmlSanitizer();
+            Post post = db.Posts.Find(id);
 			try
 			{
-				post.Continut = requestPost.Continut;
-				post.Data = DateTime.Now;
+                requestPost.Continut = sanitizer.Sanitize(requestPost.Continut);
+                post.Continut = requestPost.Continut;
+                post.Data = DateTime.Now;
 				post.TagId = requestPost.TagId;
 				post.Locatie = requestPost.Locatie;
 				TempData["message"] = "Articolul a fost modificat";
@@ -146,8 +193,8 @@ namespace SocialMediaApp.Controllers
 				post.Tags = GetAllTags();
 				return View(post);
 			}
-
-			post.Data = DateTime.Now;
+            var sanitizer = new HtmlSanitizer();
+            post.Data = DateTime.Now;
 			post.UserId = _userManager.GetUserId(User);
 
 			if (string.IsNullOrEmpty(post.UserId))
@@ -190,8 +237,9 @@ namespace SocialMediaApp.Controllers
 			}
 			if (TryValidateModel(post))
 			{
-				// Adăugare articol
-				db.Posts.Add(post);
+                post.Continut = sanitizer.Sanitize(post.Continut);
+                // Adăugare articol
+                db.Posts.Add(post);
 				await db.SaveChangesAsync();
 				return RedirectToAction("Index", "Posts");
             }
