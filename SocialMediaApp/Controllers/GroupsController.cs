@@ -16,11 +16,13 @@ namespace SocialMediaApp.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         public GroupsController(
         ApplicationDbContext context,
+        IWebHostEnvironment env,
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager
         )
         {
             db = context;
+            _env = env;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -55,21 +57,19 @@ namespace SocialMediaApp.Controllers
         [HttpPost]
         public async Task<IActionResult> New(Group group, IFormFile Image)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 ModelState.AddModelError("UserId", "User must be logged in to create a post.");
                 return View(group);
             }
 
-/*            post.UserId = _userManager.GetUserId(User);
+/*            group.UserId = _userManager.GetUserId(User);
 
-            if (string.IsNullOrEmpty(post.UserId))
+            if (string.IsNullOrEmpty(group.UserId))
             {
                 ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-                post.Tags = GetAllTags();
-                return View(post);
+                return View(group);
             }*/
-//          inca nu e facuta legatura dintre grup si user
 
             if (Image != null && Image.Length > 0)
             {
@@ -99,7 +99,6 @@ namespace SocialMediaApp.Controllers
                 // Adăugare articol
                 db.Groups.Add(group);
                 await db.SaveChangesAsync();
-                // Redirecționare după succes
                 return RedirectToAction("Index", "Groups");
             }
             return View(group);
