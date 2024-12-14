@@ -35,7 +35,7 @@ namespace SocialMediaApp.Controllers
             return View();
 		}
 
-        public IActionResult Show(int id)
+        public IActionResult Details(int id)
         {
             Post post = db.Posts.Include("Tag")
                         .Include("Comments").Include("User")
@@ -44,6 +44,7 @@ namespace SocialMediaApp.Controllers
                         .First();
             return View(post);
         }
+
 
 		// adaugarea unui comentariu din formular
 		[HttpPost]
