@@ -31,8 +31,14 @@
 </div>
 <hr />
 <br />
-@* @if (Model?.Comments != null && Model.Comments.Any()) *@
-@try
+<!-- Button to add a new post -->
+<div class="d-flex flex-row justify-content-between">
+    <a class="btn btn-primary" href="/Posts/New?groupId=@Model.Id">Adauga Postare</a>
+</div>
+<br />
+<hr />
+@if (Model?.Posts != null && Model.Posts.Any())
+@* @try *@
 {
     @foreach (var post in Model.Posts)
     {
@@ -57,10 +63,10 @@
         </div>
     }
 }
-catch (Exception ex)
+else
 {
     <p>No posts available.</p>
-    <p>@ex.Message</p> <!-- Display the exception message for debugging purposes -->
+    @* <p>@ex.Message</p> <!-- Display the exception message for debugging purposes --> *@
 }
 
 @* else *@

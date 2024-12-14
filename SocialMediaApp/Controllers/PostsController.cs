@@ -117,29 +117,29 @@ namespace SocialMediaApp.Controllers
 			post.Tags = GetAllTags();
 			return View(post);
 		}
-		//[HttpPost]
-		//public IActionResult New(Post post)
-		//{
-		//	post.Data = DateTime.Now;
-		//	post.UserId = _userManager.GetUserId(User);
-		//	try
-		//	{
-		//		db.Posts.Add(post);
-		//		db.SaveChanges();
-		//		TempData["message"] = "Articolul a fost adaugat";
-		//		return RedirectToAction("Index");
-		//	}
-		//	catch (Exception)
-		//	{
-		//		post.Tags = GetAllTags();
-		//		return View(post);
-		//	}
-		//}
+        //[HttpPost]
+        //public IActionResult New(Post post)
+        //{
+        //	post.Data = DateTime.Now;
+        //	post.UserId = _userManager.GetUserId(User);
+        //	try
+        //	{
+        //		db.Posts.Add(post);
+        //		db.SaveChanges();
+        //		TempData["message"] = "Articolul a fost adaugat";
+        //		return RedirectToAction("Index");
+        //	}
+        //	catch (Exception)
+        //	{
+        //		post.Tags = GetAllTags();
+        //		return View(post);
+        //	}
+        //}
 
-		[HttpPost]
+        [HttpPost]
 		public async Task<IActionResult> New(Post post, IFormFile Image)
 		{
-			if (!User.Identity.IsAuthenticated)
+			if (User.Identity == null || !User.Identity.IsAuthenticated)
 			{
 				ModelState.AddModelError("UserId", "User must be logged in to create a post.");
 				post.Tags = GetAllTags();
@@ -192,13 +192,11 @@ namespace SocialMediaApp.Controllers
 				// Adăugare articol
 				db.Posts.Add(post);
 				await db.SaveChangesAsync();
-				// Redirecționare după succes
 				return RedirectToAction("Index", "Posts");
-			}
+            }
 			post.Tags = GetAllTags();
 			return View(post);
 		}
-
 
 
 		//delete - cu post
@@ -229,6 +227,5 @@ namespace SocialMediaApp.Controllers
 
 			return selectList;
 		}
-
 	}
 }
