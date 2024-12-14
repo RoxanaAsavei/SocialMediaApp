@@ -9,11 +9,11 @@ using SocialMediaApp.Data;
 
 #nullable disable
 
-namespace SocialMediaApp.Data.Migrations
+namespace SocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241206113045_AddDataToPost")]
-    partial class AddDataToPost
+    [Migration("20241214120645_Initialize")]
+    partial class Initialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,12 +174,24 @@ namespace SocialMediaApp.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -237,15 +249,17 @@ namespace SocialMediaApp.Data.Migrations
 
                     b.Property<string>("Continut")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PostId")
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -267,7 +281,8 @@ namespace SocialMediaApp.Data.Migrations
 
                     b.Property<string>("Descriere")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Fotografie")
                         .HasColumnType("nvarchar(max)");
@@ -296,9 +311,16 @@ namespace SocialMediaApp.Data.Migrations
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Locatie")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("TagId")
                         .HasColumnType("int");
@@ -307,6 +329,8 @@ namespace SocialMediaApp.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("TagId");
 
@@ -328,9 +352,11 @@ namespace SocialMediaApp.Data.Migrations
 
                     b.Property<string>("Denumire")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -418,11 +444,15 @@ namespace SocialMediaApp.Data.Migrations
                 {
                     b.HasOne("SocialMediaApp.Models.Post", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
                         .WithMany("Comments")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Post");
 
@@ -431,13 +461,24 @@ namespace SocialMediaApp.Data.Migrations
 
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
                 {
-                    b.HasOne("SocialMediaApp.Models.Tag", null)
+                    b.HasOne("SocialMediaApp.Models.Group", "Group")
                         .WithMany("Posts")
-                        .HasForeignKey("TagId");
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SocialMediaApp.Models.Tag", "Tag")
+                        .WithMany("Posts")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
                         .WithMany("Posts")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Tag");
 
                     b.Navigation("User");
                 });
@@ -446,7 +487,9 @@ namespace SocialMediaApp.Data.Migrations
                 {
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
                         .WithMany("Tags")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -473,6 +516,11 @@ namespace SocialMediaApp.Data.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
+                {
+                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
