@@ -79,16 +79,15 @@ namespace SocialMediaApp.Controllers
             return View();
         }
 
-
-        public IActionResult Details(int id)
-        {
-            Post post = db.Posts.Include("Tag")
-                        .Include("Comments").Include("User")
-                        .Include("Comments.User")
-                        .Where(post => post.Id == id)
-                        .First();
-            return View(post);
-        }
+		public IActionResult Show(int id)
+		{
+			Post post = db.Posts.Include("Tag")
+						.Include("Comments").Include("User")
+						.Include("Comments.User")
+						.Where(post => post.Id == id)
+						.First();
+			return View(post);
+		}
 
 
 		// adaugarea unui comentariu din formular

@@ -20,8 +20,23 @@
 @foreach (var post in ViewBag.Posts)
 
 {
-    <partial name="PostInfo" model="post" />
-    <a href="/Posts/Show/@post.Id">Vezi mai mult</a>
+    <div class="card mb-3">
+        <div class="card-body">
+            <partial name="PostInfo" model="post" />
+            <br />
+            <div class="d-flex justify-content-center gap-5">
+                <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
+                    <button type="submit" class="btn btn-info">Vezi mai mult</button>
+                </form>
+
+                <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
+                    <button type="submit" class="btn btn-info">Editeaza</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 }
 
 <br />

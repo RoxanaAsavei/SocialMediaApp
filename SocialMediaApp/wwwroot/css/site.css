@@ -24,3 +24,8 @@ body {
 .note-editor .dropdown-toggle::after {
     display: none;
 }
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}

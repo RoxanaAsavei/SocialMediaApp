@@ -1,10 +1,22 @@
 ﻿
 
-<hr />
-<p>@Html.Raw(Model.Continut)</p>
-<small>@Model.Data</small>
-<small>@Model.Locatie</small>
+@* <hr /> *@
+@* <p>@Html.Raw(Model.Continut)</p> *@
+@* <small>@Model.Data</small> *@
+@* <small>@Model.Locatie</small> *@
 
-<br />
-<a href="/Posts/Edit/@Model.Id">Editeaza postarea</a>
-<hr />
+<div class="mx-auto card" style="width: 38rem;">
+    <div class="card-header">
+        <i class="bi bi-person-circle"> @Model.User.UserName</i>
+    </div>
+    <img src=@Model.Image class="card-img-top" alt="imagine atasata">
+    <div class="card-body">
+        <i class="bi bi-book"></i>
+        <p class="card-text">@Html.Raw(Model.Continut)</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"><i class="bi bi-calendar-check-fill"> @Model.Data.ToString("dd.MM.yyyy, HH:mm")</i></li>
+        <li class="list-group-item"><i class="bi bi-geo-alt-fill"> @Model.Locatie</i></li>
+    </ul>
+
+</div>
