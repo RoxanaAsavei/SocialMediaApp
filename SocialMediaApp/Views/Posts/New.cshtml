@@ -1,5 +1,4 @@
-﻿@model SocialMediaApp.Models.Post
-
+﻿   @model SocialMediaApp.Models.Post
 
 <h2 class="text-center mt-5">Adaugare postare</h2>
 
@@ -8,9 +7,7 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-6 offset-3">
-
             <form enctype="multipart/form-data" asp-action="New" asp-controller="Posts">
-
                 <div asp-validation-summary="All" class="text-danger"></div>
 
                 <div class="form-group">
@@ -18,7 +15,6 @@
                     <br />
                     <input asp-for="Locatie" class="form-control" />
                     <span asp-validation-for="Locatie" class="text-danger"></span>
-
                     <br /><br />
                 </div>
 
@@ -26,10 +22,7 @@
                     <label asp-for="Continut" class="form-control">Text postare</label>
                     <br />
                     <textarea asp-for="Continut" class="form-control summernote"></textarea>
-
-                    <!-- Mesaj de validare pentru continut -->
                     <span asp-validation-for="Continut" class="text-danger"></span>
-
                     <br /><br />
                 </div>
 
@@ -39,22 +32,17 @@
                     <select asp-for="TagId" asp-items="Model.Tags" class="form-control">
                         <option value="">Selectati tagul</option>
                     </select>
-
-                    <!-- Mesaj de validare pentru CategoryId -->
                     <span asp-validation-for="TagId" class="text-danger"></span>
-
-                    <br /> <br />
+                    <br /><br />
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Image">Incarca Imaginea</label>
+                    <label asp-for="Image">Incarca Imaginea (optional)</label>
                     <input asp-for="Image" class="form-control" type="file" />
-                    <span asp-validation-for="Image" class="text-danger"></span>
                 </div>
 
                 <br />
                 <button class="btn btn-success" type="submit">Posteaza</button>
-
             </form>
         </div>
     </div>

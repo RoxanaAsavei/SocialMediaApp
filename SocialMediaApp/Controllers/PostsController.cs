@@ -184,7 +184,7 @@ namespace SocialMediaApp.Controllers
         //}
 
         [HttpPost]
-		public async Task<IActionResult> New(Post post, IFormFile Image)
+		public async Task<IActionResult> New(Post post, IFormFile? Image)
 		{
 			if (User.Identity == null || !User.Identity.IsAuthenticated)
 			{
@@ -237,7 +237,7 @@ namespace SocialMediaApp.Controllers
 			if (TryValidateModel(post))
 			{
                 post.Continut = sanitizer.Sanitize(post.Continut);
-                // Adăugare articol
+                // Adăugare postare
                 db.Posts.Add(post);
 				await db.SaveChangesAsync();
 				return RedirectToAction("Index", "Posts");
