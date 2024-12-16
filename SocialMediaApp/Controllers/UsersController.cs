@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
@@ -22,8 +23,9 @@ namespace SocialMediaApp.Controllers
 			_userManager = userManager;
 			_roleManager = roleManager;
 		}
-		// afisam profilele tuturor utilizatorilor
-		public IActionResult Index()
+        // afisam profilele tuturor utilizatorilor
+        [Authorize(Roles = "User,Moderator,Admin")]
+        public IActionResult Index()
 		{
 			var users = from user in db.ApplicationUsers
 						select user;
@@ -59,13 +61,13 @@ namespace SocialMediaApp.Controllers
 		[HttpPost]
 		public IActionResult New([FromForm] ApplicationUser user)
 		{
-			try
+			if(ModelState.IsValid)
 			{
 				db.ApplicationUsers.Add(user);
 				db.SaveChanges();
 				return Redirect("/Users/Index");
 			}
-			catch (Exception e)
+			else
 			{
 				return Redirect("/Users/New");
 			}

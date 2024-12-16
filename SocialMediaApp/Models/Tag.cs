@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SocialMediaApp.Models
 {
@@ -15,7 +16,9 @@ namespace SocialMediaApp.Models
 		public virtual ICollection<Post>? Posts { get; set; }
         [Required(ErrorMessage = "User-ul este obligatorie")]
         public string UserId { get; set; }	
-		public virtual ApplicationUser User { get; set; }	
+		public virtual ApplicationUser User { get; set; }
+        [NotMapped]
+        public int PostCount { get; set; }
 
-	}
+    }
 }

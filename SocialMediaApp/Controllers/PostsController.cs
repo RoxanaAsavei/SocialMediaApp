@@ -1,5 +1,6 @@
 ﻿using Ganss.Xss;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -28,6 +29,7 @@ namespace SocialMediaApp.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
+        [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Index()
         {
             var postari = db.Posts.Include("Comments")
@@ -90,8 +92,9 @@ namespace SocialMediaApp.Controllers
 		}
 
 
-		// adaugarea unui comentariu din formular
-		[HttpPost]
+        // adaugarea unui comentariu din formular
+        [Authorize(Roles = "User,Moderator,Admin")]
+        [HttpPost]
 		public IActionResult Show([FromForm] Comment comment)
 		{
 			// luam postarea la care s-a postat comentariul
@@ -102,13 +105,13 @@ namespace SocialMediaApp.Controllers
 			post.NrComments++;
 			comment.Data = DateTime.Now;
 			comment.UserId = _userManager.GetUserId(User);
-			try
+            if(ModelState.IsValid)
 			{
 				db.Comments.Add(comment);
 				db.SaveChanges();
 				return Redirect("/Posts/Show/" + comment.PostId);
 			}
-			catch(Exception)
+			else
 			{
 
 				Post post1 = db.Posts.Include("Tag")
@@ -129,11 +132,19 @@ namespace SocialMediaApp.Controllers
 		[HttpGet]
 		public IActionResult Edit(int id)
 		{
-			Post post = db.Posts.Include("Tag")
+            Post post = db.Posts.Include("Tag")
 						.Where(post => post.Id == id)
 						.First();
 			post.Tags = GetAllTags();
-			return View(post);
+            if (post.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            {
+                return View(post);
+            }
+            else
+			{
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+				return RedirectToAction("Index");
+            }
 		}
 
 		//edit cu post - salvarea datelor
@@ -142,7 +153,12 @@ namespace SocialMediaApp.Controllers
 		{
 			var sanitizer = new HtmlSanitizer();
 			Post post = await db.Posts.FindAsync(id);
-			if (post == null)
+            if (!(post.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+			{
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            if (post == null)
 			{
 				return NotFound();
 			}
@@ -210,6 +226,7 @@ namespace SocialMediaApp.Controllers
 			return View(post);
 		}
 
+        [Authorize(Roles = "User,Moderator,Admin")]
         [HttpPost]
 		public async Task<IActionResult> New(Post post, IFormFile? Image)
 		{
@@ -280,7 +297,12 @@ namespace SocialMediaApp.Controllers
 		public IActionResult Delete(int id)
 		{
 			var post = db.Posts.Find(id);
-			db.Posts.Remove(post);
+            if (!(post.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+				return RedirectToAction("Index");
+            }
+            db.Posts.Remove(post);
 			db.SaveChanges();
 			return RedirectToAction("Index");
 		}
@@ -300,7 +322,6 @@ namespace SocialMediaApp.Controllers
 					Text = tag.Denumire
 				});
 			}
-
 			return selectList;
 		}
 	}
