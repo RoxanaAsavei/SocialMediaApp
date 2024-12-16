@@ -12,7 +12,7 @@
 
     </form>
 
-    <form method="post" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.Id">
+    <form action="/Posts/Edit/@Model.Id" method="get" class="d-inline-block">
 
         <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editeaza postarea</button>
 
@@ -121,4 +121,8 @@
 
 </div>
 
-<button type="submit"> <a href="/Posts/Index">Inapoi</a></button>
+<form action="/Posts/Index">    
+    <button class="btn btn-outline-dark" type="submit">
+        <i class="bi bi-arrow-left"></i> Inapoi
+    </button>
+</form>

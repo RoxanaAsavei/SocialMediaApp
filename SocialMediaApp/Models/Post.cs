@@ -16,6 +16,7 @@ namespace SocialMediaApp.Models
 		[StringLength(50, ErrorMessage = "Locatia nu poate avea mai mult de 50 de caractere")]
 		public string Locatie { get; set; }
 
+		public int NrComments { get; set; }
 		public string? Image { get; set; }
 
 		public DateTime Data { get; set; }

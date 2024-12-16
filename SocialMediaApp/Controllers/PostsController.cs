@@ -94,6 +94,12 @@ namespace SocialMediaApp.Controllers
 		[HttpPost]
 		public IActionResult Show([FromForm] Comment comment)
 		{
+			// luam postarea la care s-a postat comentariul
+			Post post = db.Posts
+						.Where(post => post.Id == comment.PostId)
+						.First();
+			// incrementam numarul de comentarii
+			post.NrComments++;
 			comment.Data = DateTime.Now;
 			comment.UserId = _userManager.GetUserId(User);
 			try
@@ -105,13 +111,13 @@ namespace SocialMediaApp.Controllers
 			catch(Exception)
 			{
 
-				Post post = db.Posts.Include("Tag")
+				Post post1 = db.Posts.Include("Tag")
 						.Include("Comments").Include("User")
 						.Include("Comments.User")
 						.Where(post => post.Id == comment.PostId)
 						.First();
 
-				return View(post);
+				return View(post1);
 			}
 		}
 
@@ -131,29 +137,68 @@ namespace SocialMediaApp.Controllers
 		}
 
 		//edit cu post - salvarea datelor
-	   [HttpPost]
-		public IActionResult Edit(int id, Post requestPost)
+		[HttpPost]
+		public async Task<IActionResult> Edit(int id, Post requestPost, IFormFile? Image)
 		{
-            var sanitizer = new HtmlSanitizer();
-            Post post = db.Posts.Find(id);
-			try
+			var sanitizer = new HtmlSanitizer();
+			Post post = await db.Posts.FindAsync(id);
+			if (post == null)
 			{
-                requestPost.Continut = sanitizer.Sanitize(requestPost.Continut);
-                post.Continut = requestPost.Continut;
-                post.Data = DateTime.Now;
-				post.TagId = requestPost.TagId;
-				post.Locatie = requestPost.Locatie;
-				TempData["message"] = "Articolul a fost modificat";
-				db.SaveChanges();
-				return RedirectToAction("Index");
+				return NotFound();
 			}
 
-			catch (Exception)
+			if (!ModelState.IsValid)
 			{
 				requestPost.Tags = GetAllTags();
 				return View(requestPost);
 			}
+
+			try
+			{
+				post.Continut = sanitizer.Sanitize(requestPost.Continut);
+				post.Data = DateTime.Now;
+				post.TagId = requestPost.TagId;
+				post.Locatie = requestPost.Locatie;
+
+				if (Image != null)
+				{
+					// Verificăm extensia
+					var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
+					var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+					if (!allowedExtensions.Contains(fileExtension))
+					{
+						ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
+						post.Tags = GetAllTags();
+						return View(post);
+					}
+
+					// Cale stocare
+					var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
+					var databaseFileName = "/images/" + Image.FileName;
+
+					// Salvare fișier
+					using (var fileStream = new FileStream(storagePath, FileMode.Create))
+					{
+						await Image.CopyToAsync(fileStream);
+					}
+					ModelState.Remove(nameof(post.Image));
+					post.Image = databaseFileName;
+				}
+
+				db.Entry(post).State = EntityState.Modified;
+
+				TempData["message"] = "Postarea a fost editata";
+				await db.SaveChangesAsync();
+				return Redirect("/Posts/Show/" + post.Id);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Exception: {ex.Message}");
+				requestPost.Tags = GetAllTags();
+				return View(requestPost);
+			}
 		}
+
 
 
 		// new cu get - afisarea formularului
@@ -164,24 +209,6 @@ namespace SocialMediaApp.Controllers
 			post.Tags = GetAllTags();
 			return View(post);
 		}
-        //[HttpPost]
-        //public IActionResult New(Post post)
-        //{
-        //	post.Data = DateTime.Now;
-        //	post.UserId = _userManager.GetUserId(User);
-        //	try
-        //	{
-        //		db.Posts.Add(post);
-        //		db.SaveChanges();
-        //		TempData["message"] = "Articolul a fost adaugat";
-        //		return RedirectToAction("Index");
-        //	}
-        //	catch (Exception)
-        //	{
-        //		post.Tags = GetAllTags();
-        //		return View(post);
-        //	}
-        //}
 
         [HttpPost]
 		public async Task<IActionResult> New(Post post, IFormFile? Image)
@@ -194,6 +221,7 @@ namespace SocialMediaApp.Controllers
 			}
             var sanitizer = new HtmlSanitizer();
             post.Data = DateTime.Now;
+			post.NrComments = 0;
 			post.UserId = _userManager.GetUserId(User);
 
 			if (string.IsNullOrEmpty(post.UserId))

@@ -24,6 +24,9 @@ namespace SocialMediaApp.Controllers
 		public IActionResult Delete(int id)
 		{
 			Comment comm = db.Comments.Find(id);
+			// scadem numarul de comentarii de la post
+			Post post = db.Posts.Find(comm.PostId);
+			post.NrComments--;
 			db.Comments.Remove(comm);
 			db.SaveChanges();
 			return Redirect("/Posts/Show/" + comm.PostId);

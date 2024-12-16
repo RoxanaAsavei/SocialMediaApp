@@ -2,71 +2,71 @@
     ViewBag.Title = "Afisarea postarilor";
 }
 
+
 <h2>@ViewBag.Title</h2>
 <br />
+    <form method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control"
+                   placeholder="Search topics or keywords" name="search"
+                   value="@ViewBag.SearchString">
+            <button class="btn btn-outline-success"
+                    type="submit">
+                Search
+            </button>
+        </div>
+    </form>
 
-<form method="GET">
-    <div class="input-group mb-3">
-        <input type="text" class="form-control"
-               placeholder="Search topics or keywords" name="search"
-               value="@ViewBag.SearchString">
-        <button class="btn btn-outline-success"
-                type="submit">
-            Search
-        </button>
-    </div>
-</form>
+    <form action="/Posts/New" method="get">
+        <button type="submit" class="btn btn-outline-dark add-btn"><i class="bi bi-plus-square"></i></button>
+    </form>
 
-@foreach (var post in ViewBag.Posts)
+    @foreach (var post in ViewBag.Posts)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <partial name="PostInfo" model="post" />
+                <br />
+                <div class="d-flex justify-content-center gap-5">
+                    <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
+                        <button type="submit" class="btn btn-info">Vezi mai mult</button>
+                    </form>
 
-{
-    <div class="card mb-3">
-        <div class="card-body">
-            <partial name="PostInfo" model="post" />
-            <br />
-            <div class="d-flex justify-content-center gap-5">
-                <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
-                    <button type="submit" class="btn btn-info">Vezi mai mult</button>
-                </form>
-
-                <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
-                    <button type="submit" class="btn btn-info">Editeaza</button>
-                </form>
+                    <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
+                        <button type="submit" class="btn btn-info">Editeaza</button>
+                    </form>
+                </div>
             </div>
         </div>
+    }
+
+    <br />
+    <br />
+
+    <div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@ViewBag.PaginationBaseUrl1" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= ViewBag.lastPage; i++)
+                {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" href="@ViewBag.PaginationBaseUrl@i">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.lastPage ? "disabled" : "")">
+                    <a class="page-link" href="@ViewBag.PaginationBaseUrl@(ViewBag.lastPage)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
-
-}
-
-<br />
-<br />
-
-<div>
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@ViewBag.PaginationBaseUrl1" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-
-            @for (int i = 1; i <= ViewBag.lastPage; i++)
-            {
-                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                    <a class="page-link" href="@ViewBag.PaginationBaseUrl@i">@i</a>
-                </li>
-            }
-
-            <li class="page-item @(ViewBag.CurrentPage == ViewBag.lastPage ? "disabled" : "")">
-                <a class="page-link" href="@ViewBag.PaginationBaseUrl@(ViewBag.lastPage)" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>
-
-<br />
-<br />
-<a href="/Posts/New">Postare noua</a>
+    <br />
+    <br />
