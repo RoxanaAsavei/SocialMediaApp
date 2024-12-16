@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SocialMediaApp.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -199,24 +199,24 @@ namespace SocialMediaApp.Migrations
                 name: "UserGroups",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    GroupId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    GroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserGroups", x => x.Id);
+                    table.PrimaryKey("PK_UserGroups", x => new { x.UserId, x.GroupId });
                     table.ForeignKey(
                         name: "FK_UserGroups_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserGroups_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,6 +227,7 @@ namespace SocialMediaApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Continut = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Locatie = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NrComments = table.Column<int>(type: "int", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Data = table.Column<DateTime>(type: "datetime2", nullable: false),
                     GroupId = table.Column<int>(type: "int", nullable: true),
@@ -355,11 +356,6 @@ namespace SocialMediaApp.Migrations
                 name: "IX_UserGroups_GroupId",
                 table: "UserGroups",
                 column: "GroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserGroups_UserId",
-                table: "UserGroups",
-                column: "UserId");
         }
 
         /// <inheritdoc />

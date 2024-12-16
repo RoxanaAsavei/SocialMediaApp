@@ -115,18 +115,6 @@ namespace SocialMediaApp.Controllers
                             .First();
             return View(group);
         }
-        /*        public IActionResult Show(int id)
-                {
-                    Group group = db.Groups
-                                    .Include(g => g.Posts)
-                                    .ThenInclude(p => p.User)
-                                    .FirstOrDefault(g => g.Id == id);
-                    if (group == null)
-                    {
-                        return NotFound();
-                    }
-                    return View(group);
-                }*/
 
         public IActionResult Delete(int id)
         {

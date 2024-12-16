@@ -368,23 +368,17 @@ namespace SocialMediaApp.Migrations
 
             modelBuilder.Entity("SocialMediaApp.Models.UserGroup", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnOrder(0);
 
-                    b.HasKey("Id");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("UserId", "GroupId");
 
                     b.HasIndex("GroupId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("UserGroups");
                 });
@@ -497,12 +491,16 @@ namespace SocialMediaApp.Migrations
             modelBuilder.Entity("SocialMediaApp.Models.UserGroup", b =>
                 {
                     b.HasOne("SocialMediaApp.Models.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId");
+                        .WithMany("UserGroups")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -516,11 +514,15 @@ namespace SocialMediaApp.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Tags");
+
+                    b.Navigation("UserGroups");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
                 {
                     b.Navigation("Posts");
+
+                    b.Navigation("UserGroups");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
