@@ -14,6 +14,7 @@ namespace SocialMediaApp.Models
 		public string Descriere { get; set; }
 		public string? Fotografie { get; set; }
 		// de vazut ce facem cu moderatorul care creeaza grupul
+		virtual public ICollection<UserGroup>? UserGroups { get; set; }
 		virtual public ICollection<Post>? Posts { get; set; }
 	}
 }

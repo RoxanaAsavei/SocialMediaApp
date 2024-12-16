@@ -21,8 +21,23 @@ namespace SocialMediaApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure cascade delete for Comment and Post
-            modelBuilder.Entity<Comment>()
+			// definire primary key compus
+			modelBuilder.Entity<UserGroup>()
+		   .HasKey(ug => new { ug.UserId, ug.GroupId });
+
+			modelBuilder.Entity<UserGroup>()
+				.HasOne(ug => ug.User)
+				.WithMany(u => u.UserGroups)
+				.HasForeignKey(ug => ug.UserId);
+
+			modelBuilder.Entity<UserGroup>()
+				.HasOne(ug => ug.Group)
+				.WithMany(g => g.UserGroups)
+				.HasForeignKey(ug => ug.GroupId);
+
+
+			// Configure cascade delete for Comment and Post
+			modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Post)
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId)

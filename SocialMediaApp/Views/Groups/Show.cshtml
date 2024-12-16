@@ -4,20 +4,22 @@
 <br />
 <hr />
 <br />
-<div class="card-body">
 
-    <h3 class="card-title alert-success py-3 px-3 rounded-2">
-        @Model.Id
-    </h3>
-
-    <div class="card-text">@Model.Nume</div>
-    <div class="d-flex justify-content-between flex-row mt-5">
-        <span class="alert-success">@Model.Descriere</span>
+<div class="mx-auto card" style="width: 38rem;">
+    <div class="card-header button-container">
+        <i class="bi bi-person-circle"> @Model.Nume</i>
     </div>
-    <div class="d-flex justify-content-between flex-row mt-5">
-        <span class="alert-success">@Model.Fotografie</span>
+    @if (@Model.Fotografie != null)
+    {
+        <img src=@Model.Fotografie class="card-img-top" alt="imagine atasata">
+    }
+    <div class="card-body">
+        <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+            @Html.Raw(Model.Descriere)
+        </p>
     </div>
 </div>
+
 <br />
 <hr />
 <div class="d-flex flex-row justify-content-between">
