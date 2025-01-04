@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
+using System.Security.Claims;
 
 namespace SocialMediaApp.Controllers
 {
@@ -40,8 +41,17 @@ namespace SocialMediaApp.Controllers
 		}
 
 		// vizualizare profil -> ce vad eu din profilul tau
-		public IActionResult Details(string id)
-		{   // afisez detaliile personale
+		public IActionResult Details()
+		{
+			var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(id))
+			{
+				return RedirectToAction("Login", "Account");
+			}
+
+
+			// afisez detaliile personale
+
 			ApplicationUser user = db.Users.Find(id);
 			if (user == null)
 			{
