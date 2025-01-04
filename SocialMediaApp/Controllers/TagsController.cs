@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 
@@ -20,29 +23,45 @@ namespace SocialMediaApp.Controllers
 			_userManager = userManager;
 			_roleManager = roleManager;
 		}
-		public IActionResult Index()
+        [Authorize(Roles = "User,Moderator,Admin")]
+        public IActionResult Index()
 		{
 			if (TempData.ContainsKey("message"))
 			{
 				ViewBag.message = TempData["message"].ToString();
 			}
-			var tags = from tag in db.Tags
+/*			var tags = from tag in db.Tags
 					   orderby tag.Denumire
-					   select tag;
-			ViewBag.Tags = tags;
+					   select tag;*/
+            var tags = db.Tags.Include(t => t.Posts).ToList();
+
+            // Calculate the number of posts for each tag
+            foreach (var tag in tags)
+            {
+                tag.PostCount = tag.Posts?.Count ?? 0;
+            }
+            ViewBag.Tags = tags;
 			return View();
 		}
-		public ActionResult Show(int id)
+        [Authorize(Roles = "User,Moderator,Admin")]
+        public ActionResult Show(int id)
 		{
-			Tag tag = db.Tags.Find(id);
-			ViewBag.Tag = tag;
-			return View();
+			/*Tag tag = db.Tags.Find(id);*/
+			var tag = db.Tags.Include(t => t.Posts).ThenInclude(p => p.User).FirstOrDefault(t => t.Id == id);
+			if (tag == null)
+			{
+				return NotFound();
+			}
+            ViewBag.Tag = tag;
+            ViewBag.Posts = tag.Posts;
+            return View(tag);
 		}
 		public IActionResult New()
 		{
 			return View();
 		}
-		[HttpPost]
+        [Authorize(Roles = "User,Moderator,Admin")]
+        [HttpPost]
 		public IActionResult New(Tag t)
 		{
 			t.UserId = _userManager.GetUserId(User);
@@ -62,20 +81,33 @@ namespace SocialMediaApp.Controllers
 		{
 			Tag tag = db.Tags.Find(id);
 			ViewBag.Tag = tag;
-			return View(tag);
+            if (tag.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            {
+                return View(tag);
+            }
+            else
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
 		}
 		[HttpPost]
 		public ActionResult Edit(int id, Tag requestTag)
 		{
 			Tag tag = db.Tags.Find(id);
-			try
+            if (!(tag.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            if(ModelState.IsValid)
 			{
 				tag.Denumire = requestTag.Denumire;
 				db.SaveChanges();
 				TempData["message"] = "Categoria a fost modificata!";
 				return RedirectToAction("Index");
 			}
-			catch (Exception)
+			else
 			{
 				return View(requestTag);
 			}
@@ -83,7 +115,12 @@ namespace SocialMediaApp.Controllers
 		public ActionResult Delete(int id)
 		{
 			Tag tag = db.Tags.Find(id);
-			db.Tags.Remove(tag);
+            if (!(tag.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            db.Tags.Remove(tag);
 			TempData["message"] = "Categoria a fost stearsa";
 			 db.SaveChanges();
 			return RedirectToAction("Index");

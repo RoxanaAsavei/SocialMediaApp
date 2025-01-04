@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 
@@ -26,7 +27,12 @@ namespace SocialMediaApp.Controllers
 			Comment comm = db.Comments.Find(id);
 			// scadem numarul de comentarii de la post
 			Post post = db.Posts.Find(comm.PostId);
-			post.NrComments--;
+            if (!(comm.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            post.NrComments--;
 			db.Comments.Remove(comm);
 			db.SaveChanges();
 			return Redirect("/Posts/Show/" + comm.PostId);
@@ -34,20 +40,33 @@ namespace SocialMediaApp.Controllers
 		public IActionResult Edit(int id)
 		{
 			Comment comm = db.Comments.Find(id);
-			return View(comm);
+            if (comm.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            {
+                return View(comm);
+            }
+            else
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
 		}
 
 		[HttpPost]
 		public IActionResult Edit(int id, Comment requestComment)
 		{
 			Comment comm = db.Comments.Find(id);
-			try
+            if (!(comm.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            if(ModelState.IsValid)
 			{
 				comm.Continut = requestComment.Continut;
 				db.SaveChanges();
 				return Redirect("/Posts/Show/" + comm.PostId);
 			}
-			catch (Exception)
+			else
 			{
 				return View(requestComment);
 			}

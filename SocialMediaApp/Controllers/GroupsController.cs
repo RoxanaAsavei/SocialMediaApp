@@ -1,9 +1,11 @@
 ﻿using Ganss.Xss;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 using System.Net.NetworkInformation;
@@ -28,6 +30,7 @@ namespace SocialMediaApp.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
+        [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Index()
         {
             var grupuri = from item in db.Groups
@@ -42,26 +45,22 @@ namespace SocialMediaApp.Controllers
             Group group = new Group();
             return View(group);
         }
-
-        [HttpPost]
-        public async Task<IActionResult> Join(int id)
-        {
-            if (User.Identity == null || !User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            var userId = _userManager.GetUserId(User);
-            var userGroup = new UserGroup
-            {
-                UserId = userId,
-                GroupId = id
-            };
-            db.UserGroups.Add(userGroup);
-            await db.SaveChangesAsync();
-            return Redirect("/Groups/Show/" + id);
-
-        }
-
+        /*        [HttpPost]
+                public IActionResult New(Group group)
+                {
+                    if(ModelState.IsValid)
+                    {
+                        db.Groups.Add(group);
+                        db.SaveChanges();
+                        TempData["message"] = "Grupul a fost creat";
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        return View(group);
+                    }
+                }*/
+        [Authorize(Roles = "Moderator,Admin")]
         [HttpPost]
         public async Task<IActionResult> New(Group group, IFormFile? Image)
         {
@@ -111,7 +110,7 @@ namespace SocialMediaApp.Controllers
             }
             return View(group);
         }
-
+        [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Show(int id)
         {
             Group group = db.Groups.Find(id);
@@ -122,6 +121,11 @@ namespace SocialMediaApp.Controllers
         public IActionResult Delete(int id)
         {
             var group = db.Groups.Find(id);
+            if (!(User.IsInRole("Moderator") || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
             db.Groups.Remove(group);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -130,14 +134,27 @@ namespace SocialMediaApp.Controllers
         public ActionResult Edit(int id)
         {
             Group grup = db.Groups.Find(id);
-            return View(grup);
+            if (User.IsInRole("Moderator") || User.IsInRole("Admin"))
+            {
+                return View(grup);
+            }
+            else
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Group requestGroup, IFormFile Image)
+        public async Task<IActionResult> Edit(int id, Group requestGroup, IFormFile? Image)
         {
             Group group = db.Groups.Find(id);
-            try
+            if (!(User.IsInRole("Moderator") || User.IsInRole("Admin")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
+                return RedirectToAction("Index");
+            }
+            if(ModelState.IsValid)
             {
                 group.Nume = requestGroup.Nume;
                 group.Descriere = requestGroup.Descriere;
@@ -168,7 +185,7 @@ namespace SocialMediaApp.Controllers
                 TempData["message"] = "Articolul a fost modificat";
                 return RedirectToAction("Index");
             }
-            catch (Exception)
+            else
             {
                 return View(requestGroup);
             }
