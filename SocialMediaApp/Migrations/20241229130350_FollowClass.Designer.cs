@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaApp.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaApp.Data;
 namespace SocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241229130350_FollowClass")]
+    partial class FollowClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,11 +273,11 @@ namespace SocialMediaApp.Migrations
 
             modelBuilder.Entity("SocialMediaApp.Models.Follow", b =>
                 {
-                    b.Property<string>("FollowerId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("FollowedId")
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool?>("Accepted")
                         .HasColumnType("bit");
@@ -282,9 +285,17 @@ namespace SocialMediaApp.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("FollowerId", "FollowedId");
+                    b.Property<string>("FollowedId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FollowerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("FollowedId");
+
+                    b.HasIndex("FollowerId");
 
                     b.ToTable("Follows");
                 });
@@ -478,14 +489,12 @@ namespace SocialMediaApp.Migrations
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "Followed")
                         .WithMany("Followers")
                         .HasForeignKey("FollowedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "Follower")
                         .WithMany("Following")
                         .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Followed");
 

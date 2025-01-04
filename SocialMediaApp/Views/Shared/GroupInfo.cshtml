@@ -1,0 +1,14 @@
+﻿<div class="mx-auto card" style="width: 38rem;">
+    <div class="card-header button-container">
+        <i class="bi bi-people-fill">@Model.Nume</i>
+    </div>
+    @if (@Model.Fotografie != null)
+    {
+        <img src=@Model.Fotografie class="card-img-top" alt="imagine atasata">
+    }
+    <div class="card-body">
+        <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+            @Html.Raw(Model.Descriere)
+        </p>
+    </div>
+</div>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 using System.Net.NetworkInformation;
@@ -78,7 +79,8 @@ namespace SocialMediaApp.Controllers
                 ViewBag.PaginationBaseUrl = "/Posts/Index?page=";
             }
 
-            return View();
+			SetAccessRights();
+			return View();
         }
 
 		public IActionResult Show(int id)
@@ -88,6 +90,7 @@ namespace SocialMediaApp.Controllers
 						.Include("Comments.User")
 						.Where(post => post.Id == id)
 						.First();
+			SetAccessRights();
 			return View(post);
 		}
 
@@ -323,6 +326,14 @@ namespace SocialMediaApp.Controllers
 				});
 			}
 			return selectList;
+		}
+
+
+		private void SetAccessRights()
+		{
+
+			ViewBag.UserCurent = _userManager.GetUserId(User);
+			ViewBag.EsteAdmin = User.IsInRole("Admin");
 		}
 	}
 }

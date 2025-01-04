@@ -4,21 +4,27 @@
 <br />
 <partial name="PostInfo" model="Model" />
 <br />
-<div class="d-flex flex-row justify-content-center gap-3">
 
-    <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">
+@if(ViewBag.UserCurent == Model.UserId || ViewBag.EsteAdmin == true)
+{
 
-        <button class="btn btn-outline-danger bi bi-trash" type="submit"> Sterge postarea</button>
+    <div class="d-flex flex-row justify-content-center gap-3">
 
-    </form>
+        <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">
 
-    <form action="/Posts/Edit/@Model.Id" method="get" class="d-inline-block">
+            <button class="btn btn-outline-danger bi bi-trash" type="submit"> Sterge postarea</button>
 
-        <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editeaza postarea</button>
+        </form>
 
-    </form>
+        <form action="/Posts/Edit/@Model.Id" method="get" class="d-inline-block">
 
-</div>
+            <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editeaza postarea</button>
+
+        </form>
+
+    </div>
+}
+
 <br />
 <hr />
 <br />
@@ -42,27 +48,29 @@
                         </div>
                         <br>
 
-                        <div class="d-flex gap-3">
+                        @if(ViewBag.UserCurent == comm.UserId || ViewBag.EsteAdmin == true) {
+                            <div class="d-flex gap-3">
 
-                            <div>
+                                <div>
 
-                                <a class="btn btn-outline-primary" asp-controller="Comments" asp-action="Edit" asp-route-id="@comm.Id">
-                                    <i class="bi bi-pencil-square"></i> Editeaza
-                                </a>
+                                    <a class="btn btn-outline-primary" asp-controller="Comments" asp-action="Edit" asp-route-id="@comm.Id">
+                                        <i class="bi bi-pencil-square"></i> Editeaza
+                                    </a>
+
+                                </div>
+
+                                <div>
+
+                                    <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comm.Id">
+
+                                        <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Sterge</button>
+
+                                    </form>
+
+                                </div>
 
                             </div>
-
-                            <div>
-
-                                <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comm.Id">
-
-                                    <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Sterge</button>
-
-                                </form>
-
-                            </div>
-
-                        </div>
+                        }
 
                         <br />
 

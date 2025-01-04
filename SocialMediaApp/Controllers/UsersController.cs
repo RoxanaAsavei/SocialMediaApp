@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AngleSharp.Io;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,32 +25,85 @@ namespace SocialMediaApp.Controllers
 			_roleManager = roleManager;
 		}
         // afisam profilele tuturor utilizatorilor
+		// la final trebuie autorizat doar pentru admin -> panoul de admin
         [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Index()
 		{
 			var users = from user in db.ApplicationUsers
 						select user;
-			ViewBag.Users = users;
+			ViewBag.UsersList = users;
 			return View();
 		}
 
-		// show - detalii si feed pentru un utilizator
-		// ca detalii - afisez datele personale si grupurile din care face parte
+		// vizualizare profil -> ce vad eu din profilul tau
 		public IActionResult Details(string id)
-		{
-			ApplicationUser user = db.ApplicationUsers.Include("Groups").Include("UserGroups")
-						.Where(user => user.Id == id)
-						.First();
+		{   // afisez detaliile personale
+			ApplicationUser user = db.Users.Find(id);
+			if (user == null)
+			{
+				return NotFound();
+			}
+			// luam postarile utilizatorului
+			var posts = db.Posts
+								.Include(p => p.Comments)
+								.Include(p => p.Tag)
+								.Where(post => post.UserId == id && post.GroupId == null)
+								.ToList();
+
+			int noFollowers = db.Follows.Where(f => f.FollowedId == id && f.Accepted == true).Count();
+			int noFollowing = db.Follows.Where(f => f.FollowerId == id && f.Accepted == true).Count();
+			int noPosts = db.Posts.Where(p => p.UserId == id && p.GroupId == null).Count();
+
+			ViewBag.UserCurent = _userManager.GetUserId(User);
+			ViewBag.EsteAdmin = User.IsInRole("Admin");
+			ViewBag.noFollowers = noFollowers;
+			ViewBag.noFollowing = noFollowing;
+			ViewBag.noPosts = noPosts;
+			ViewBag.Posts = posts;
+
+			// daca nu are vizibilitatea profilului setata, o punem pe public
+			if (user.Privacy == null)
+			{
+				user.Privacy = false;
+				db.SaveChanges();
+			}
+
+			// daca nu are imaginea setata, o punem pe default
+			if (user.Image == null)
+			{
+				user.Image = "/images/default_image.jpg";
+				db.SaveChanges();
+			}
+
+			// vad daca il urmaresc / i-am dat follow
+			bool? accepted = db.Follows.
+				Where(f => f.FollowerId == _userManager.GetUserId(User) && f.FollowedId == id)
+				.Select(f => f.Accepted).FirstOrDefault();
+			if (accepted != null) 
+			{ 
+				ViewBag.Accepted = accepted;
+			}
+
+			ViewBag.IsMe = _userManager.GetUserId(User) == id;
+			ViewBag.SeePosts = SetViewRights(id); // ca sa stim cat afisam din informatii
 			return View(user);	
 		}
 
-		// feed - afisez postarile utilizatorului
-		public IActionResult Feed(string id)
-		{ 
-			Post posts = db.Posts.Include("User").Include("Comments").Include("Tags")
-						.Where(post => post.UserId == id)
-						.First();
-			return View(posts);
+		private bool SetViewRights(string id)
+		{
+			ApplicationUser user = db.Users.Find(id);
+			// luam userul curent
+			
+			// daca contul e public, daca e contul meu sau daca sunt admin, afisez tot
+			if (user.Privacy == false || user.Id == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		
 		}
 
 		// new - cu get, formularul de inregistrare
@@ -81,6 +135,7 @@ namespace SocialMediaApp.Controllers
 			{
 				return NotFound();
 			}
+
 			return View(user);
 		}
 
@@ -98,7 +153,7 @@ namespace SocialMediaApp.Controllers
 					{
 						db.SaveChanges();
 					}
-					return Redirect("/Users/Index");
+					return Redirect("/Users/Details/" + id);
 				}
 				catch (Exception)
 				{

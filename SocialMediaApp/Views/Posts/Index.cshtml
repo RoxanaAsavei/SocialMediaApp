@@ -31,10 +31,12 @@
                     <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
                         <button type="submit" class="btn btn-info">Vezi mai mult</button>
                     </form>
-
+                    @if(ViewBag.UserCurent == post.UserId || ViewBag.EsteAdmin == true) {
                     <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
                         <button type="submit" class="btn btn-info">Editeaza</button>
                     </form>
+                    }
+                  
                 </div>
             </div>
         </div>

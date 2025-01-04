@@ -10,12 +10,11 @@ namespace SocialMediaApp.Models
 		[MaxLength(500, ErrorMessage = "Continutul nu poate avea mai mult de 500 de caractere")]	
 		public string Continut { get; set; }
 		[Required(ErrorMessage = "Comentariul trebuie sa apartina unei postari")]
-		public int PostId { get; set; }
-		[Required(ErrorMessage = "User-ul este obligatoriu")]
-		public string UserId { get; set; }
+		public int? PostId { get; set; }
+		public string? UserId { get; set; }
 		public DateTime Data { get; set; }
-		public virtual Post Post { get; set; }
-		public virtual ApplicationUser User { get; set; }
+		public virtual Post? Post { get; set; }
+		public virtual ApplicationUser? User { get; set; }
 
 	}
 }

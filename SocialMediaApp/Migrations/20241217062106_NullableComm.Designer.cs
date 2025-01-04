@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaApp.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaApp.Data;
 namespace SocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241217062106_NullableComm")]
+    partial class NullableComm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,27 +271,6 @@ namespace SocialMediaApp.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("SocialMediaApp.Models.Follow", b =>
-                {
-                    b.Property<string>("FollowerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("FollowedId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool?>("Accepted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("FollowerId", "FollowedId");
-
-                    b.HasIndex("FollowedId");
-
-                    b.ToTable("Follows");
-                });
-
             modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -473,25 +455,6 @@ namespace SocialMediaApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SocialMediaApp.Models.Follow", b =>
-                {
-                    b.HasOne("SocialMediaApp.Models.ApplicationUser", "Followed")
-                        .WithMany("Followers")
-                        .HasForeignKey("FollowedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SocialMediaApp.Models.ApplicationUser", "Follower")
-                        .WithMany("Following")
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Followed");
-
-                    b.Navigation("Follower");
-                });
-
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
                 {
                     b.HasOne("SocialMediaApp.Models.Group", "Group")
@@ -549,10 +512,6 @@ namespace SocialMediaApp.Migrations
             modelBuilder.Entity("SocialMediaApp.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Followers");
-
-                    b.Navigation("Following");
 
                     b.Navigation("Posts");
 

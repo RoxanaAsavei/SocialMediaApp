@@ -16,10 +16,27 @@ namespace SocialMediaApp.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Follow> Follows { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // definire primary key compus
+            modelBuilder.Entity<Follow>()
+			.HasKey(f => new { f.FollowerId, f.FollowedId });
+
+			modelBuilder.Entity<ApplicationUser>()
+				.HasMany(u => u.Followers)
+				.WithOne(f => f.Followed)
+				.HasForeignKey(f => f.FollowedId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			modelBuilder.Entity<ApplicationUser>()
+				.HasMany(u => u.Following)
+				.WithOne(f => f.Follower)
+				.HasForeignKey(f => f.FollowerId)
+				.OnDelete(DeleteBehavior.Restrict);
 
 			// definire primary key compus
 			modelBuilder.Entity<UserGroup>()

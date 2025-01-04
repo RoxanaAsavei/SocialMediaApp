@@ -56,6 +56,8 @@ namespace SocialMediaApp.Controllers
             ViewBag.Posts = tag.Posts;
             return View(tag);
 		}
+
+		[Authorize(Roles = "Moderator,Admin")]
 		public IActionResult New()
 		{
 			return View();

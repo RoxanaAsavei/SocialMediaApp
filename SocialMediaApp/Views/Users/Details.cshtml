@@ -1,2 +1,83 @@
 ﻿@model SocialMediaApp.Models.ApplicationUser
 
+<div class="card mb-3 align-header">
+	<img class="profile-image" src="@Model.Image" alt="imagine profil">
+	<div class="profile-title"><b>@Model.FirstName @Model.LastName</b></div>
+	<div class="card-text">@Model.Description</div>
+
+	<div class="btn-group w-100 d-flex"  aria-label="Basic example">
+		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noFollowers Followers</button>
+		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noPosts Posts</button>
+		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noFollowing Following</button>
+	</div>
+
+	@if(ViewBag.IsMe == true) { 
+		<button type="submit" class="btn btn-outline-primary w-100">Editează profilul</button>
+	}
+	else {
+		if(ViewBag.Accepted == null) {
+			<button type="submit" class="btn btn-outline-primary w-100">Urmărește</button>
+		}
+
+		else {
+			if(ViewBag.Accepted == true) {
+				<button type="submit" class="btn btn-outline-primary w-100">Urmărești</button>
+			}
+
+			else {
+				<button type="submit" class="btn btn-outline-primary w-100">Cererea a fost trimisă</button>
+			}
+		}
+	}
+
+
+
+</div>
+
+@if(ViewBag.SeePosts == true || ViewBag.Accepted == true)
+{
+	@* vedem daca are postari *@
+	@if(ViewBag.noPosts == 0)
+	{
+		<div class="card mb-3">
+			<div class="card-body text-center fw-bold h-100 w-100">
+				<p class="card-text fs-1">
+					<i class="bi bi-ban-fill"></i> Nu există postări
+				</p>
+			</div>
+		</div>
+	}
+	else
+	{	
+		@foreach(var post in ViewBag.Posts)
+		{
+			<div class="card mb-3">
+				<div class="card-body">
+					<partial name="PostInfo" model="post" />
+					<br />
+					<div class="d-flex justify-content-center gap-5">
+						<form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
+							<button type="submit" class="btn btn-info">Vezi mai mult</button>
+						</form>
+						@if (ViewBag.UserCurent == post.UserId || ViewBag.EsteAdmin == true)
+						{
+							<form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
+								<button type="submit" class="btn btn-info">Editeaza</button>
+							</form>
+						}
+
+					</div>
+				</div>
+			</div>
+		}
+	}
+
+}
+else
+{
+	<div class="card mb-3">
+		<div class="card-body">
+			<p class="card-text">Contul este privat</p>
+		</div>
+	</div>
+}
