@@ -74,3 +74,9 @@ body {
 .counter .warning {
     color: red;
 }
+
+.post-image {
+    width: 25%;
+    height: 25%;
+    padding-top: 2rem;
+}

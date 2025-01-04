@@ -1,11 +1,14 @@
-﻿<div class="mx-auto card" style="width: 38rem;">
+﻿<div class="mx-auto card w-auto h-auto">
     <div class="card-header button-container">
         <i class="bi bi-person-circle"> @Model.User.UserName</i>
         <i class="bi bi-bookmark-fill"> @Model.Tag.Denumire</i>
     </div>
     @if (@Model.Image != null)
     {
-        <img src=@Model.Image class="card-img-top" alt="imagine atasata">
+        <div class="d-flex justify-content-center">
+            <img src=@Model.Image class="card-img-top post-image" alt="imagine atasata">
+        </div>
+   
     }
     <div class="card-body">
         <i class="bi bi-chat-left-text"> @Model.NrComments</i>
