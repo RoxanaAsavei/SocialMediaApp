@@ -1,4 +1,5 @@
 ﻿using AngleSharp.Io;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +14,17 @@ namespace SocialMediaApp.Controllers
 	{
 		private readonly ApplicationDbContext db;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly IWebHostEnvironment _env;
 		private readonly RoleManager<IdentityRole> _roleManager;
 		public UsersController(
 		ApplicationDbContext context,
+		IWebHostEnvironment env,
 		UserManager<ApplicationUser> userManager,
 		RoleManager<IdentityRole> roleManager
 		)
 		{
 			db = context;
+			_env = env;
 			_userManager = userManager;
 			_roleManager = roleManager;
 		}
@@ -136,31 +140,79 @@ namespace SocialMediaApp.Controllers
 				return NotFound();
 			}
 
-			return View(user);
+			// vedem daca are drepturi de edit
+			if (id == _userManager.GetUserId(User))
+			{
+				return View(user);
+			}
+
+			else
+			{
+				TempData["message"] = "Nu puteti edita un profil care nu va apartine";
+				return Redirect("/Users/Details/" + id);
+			}
 		}
 
 		// edit - cu post, editarea efectiva + salvarea in baza de date
 
 		[HttpPost]
-		public IActionResult Edit(string id, [FromForm] ApplicationUser user)
+		public async Task<IActionResult> Edit(string id, ApplicationUser requestUser, IFormFile? Image)
 		{
-			if (ModelState.IsValid)
+
+			ApplicationUser user = await db.Users.FindAsync(id);
+			if (user == null)
 			{
-				try
-				{
-					ApplicationUser? userToEdit = db.ApplicationUsers.Find(id);
-					if (userToEdit != null && TryUpdateModelAsync(userToEdit).Result)
-					{
-						db.SaveChanges();
-					}
-					return Redirect("/Users/Details/" + id);
-				}
-				catch (Exception)
-				{
-					return Redirect("/Users/Edit/" + id);
-				}
+				return NotFound();
 			}
-			return Redirect("/Users/Edit/" + id);
+
+			if (!ModelState.IsValid)
+			{
+				return View(requestUser);
+			}
+
+			try
+			{
+				user.FirstName = requestUser.FirstName;
+				user.LastName = requestUser.LastName;
+				user.Description = requestUser.Description;
+				user.UserName = requestUser.UserName;
+				user.Privacy = requestUser.Privacy;
+
+				if (Image != null)
+				{
+					// Verificăm extensia
+					var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
+					var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+					if (!allowedExtensions.Contains(fileExtension))
+					{
+						ModelState.AddModelError("ProfileImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
+						return View(requestUser);
+					}
+
+					// Cale stocare
+					var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
+					var databaseFileName = "/images/" + Image.FileName;
+
+					// Salvare fișier
+					using (var fileStream = new FileStream(storagePath, FileMode.Create))
+					{
+						await Image.CopyToAsync(fileStream);
+					}
+					ModelState.Remove(nameof(user.Image));
+					user.Image = databaseFileName;
+				}
+
+				db.Entry(user).State = EntityState.Modified;
+
+				TempData["message"] = "Profilul a fost editata";
+				await db.SaveChangesAsync();
+				return Redirect("/Users/Details/" + user.Id);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Exception: {ex.Message}");
+				return View(requestUser);
+			}
 		}
 		public IActionResult Show(string id) // by default, ma duce pe pagina de feed a utilizatorului
 		{

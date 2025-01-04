@@ -15,7 +15,7 @@ namespace SocialMediaApp.Models
 		public string? FirstName { get; set; }
 		public string? LastName { get; set; }
 
-		public bool? Privacy; // true -> private account
+		public bool Privacy { get; set; } // true -> private account
 							  // false -> public account
 
 		public virtual ICollection<Follow>? Followers { get; set; }

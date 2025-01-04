@@ -11,8 +11,10 @@
 		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noFollowing Following</button>
 	</div>
 
-	@if(ViewBag.IsMe == true) { 
-		<button type="submit" class="btn btn-outline-primary w-100">Editează profilul</button>
+	@if(ViewBag.IsMe == true) {
+		<form action="/Users/Edit/@Model.Id" method="get" class="w-100">
+			<button type="submit" class="btn btn-outline-primary w-100">Editează profilul</button>
+		</form>
 	}
 	else {
 		if(ViewBag.Accepted == null) {
@@ -76,8 +78,10 @@
 else
 {
 	<div class="card mb-3">
-		<div class="card-body">
-			<p class="card-text">Contul este privat</p>
+		<div class="card-body text-center fw-bold h-100 w-100">
+			<p class="card-text fs-1">
+				<i class="bi bi-eye-slash"></i> Contul este privat
+			</p>
 		</div>
 	</div>
 }
