@@ -38,6 +38,7 @@ namespace SocialMediaApp.Controllers
                                     .Include("User")
                                     .OrderByDescending(a => a.Data);
 
+
             var search = HttpContext.Request.Query["search"].ToString().Trim();
             if (!string.IsNullOrEmpty(search))
             {

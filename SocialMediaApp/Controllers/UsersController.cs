@@ -235,15 +235,25 @@ namespace SocialMediaApp.Controllers
 				return View(requestUser);
 			}
 		}
-		public IActionResult Show(string id) // by default, ma duce pe pagina de feed a utilizatorului
+		
+		public IActionResult Search()
 		{
-			// pentru profilul unui utilizator o sa am 2 pagini: una de tip feed, 
-			// unde o sa afisez postarile utilizatorului si alta de tip profile,
-			// unde o sa afisez informatii despre utilizator
-			ApplicationUser user = db.ApplicationUsers.Include("Posts")
-						.Include("Comments").Include("Tags").Include("Groups").Include("UserGroups")
-						.Where(user => user.Id == id)
-						.First();
+			// search pe useri
+			// search pe useri
+			var search = HttpContext.Request.Query["search"].ToString().Trim();
+			if (!string.IsNullOrEmpty(search))
+			{
+				// luam userii care contin in prenume stringul cautat
+				List<string> userIdFirstName = db.ApplicationUsers.Where(usr => usr.FirstName.Contains(search)).Select(u => u.Id).ToList();
+				// luam userii care contin in nume stringul cautat
+				List<string> userIdLastName = db.ApplicationUsers.Where(usr => usr.LastName.Contains(search)).Select(u => u.Id).ToList();
+				// luam userii care contin in username stringul cautat
+				List<string> userIdUserName = db.ApplicationUsers.Where(usr => usr.UserName.Contains(search)).Select(u => u.Id).ToList();
+				List<string> mergedIds = userIdFirstName.Union(userIdLastName).Union(userIdUserName).ToList();
+				ViewBag.Users = db.Users.Where(user => mergedIds.Contains(user.Id)).ToList();
+				ViewBag.UsersCt = db.Users.Where(user => mergedIds.Contains(user.Id)).ToList().Count();
+			}
+			ViewBag.SearchUser = search;
 			return View();
 		}
 	}

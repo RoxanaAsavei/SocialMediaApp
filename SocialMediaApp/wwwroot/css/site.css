@@ -89,3 +89,9 @@ body {
 .no-underline:hover{
     text-decoration: none;
 }
+
+.p-card:hover {
+    background-color: #000000;
+    color: #FFFFFF;
+    cursor: pointer;
+}

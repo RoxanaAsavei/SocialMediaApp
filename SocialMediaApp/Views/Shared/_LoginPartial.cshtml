@@ -7,7 +7,14 @@
 {
     var userId = UserManager.GetUserId(User);
     <li class="nav-item">
-            <a class="nav-link text-dark bi bi-people-fill" asp-area="" asp-controller="Follows" asp-action="Index" asp-route-id="@userId"></a>
+            <a class="nav-link text-dark bi bi-search" asp-area="" asp-controller="Users" asp-action="Search">
+               Caută
+            </a>
+    </li>
+    <li class="nav-item">
+            <a class="nav-link text-dark bi bi-people-fill" asp-area="" asp-controller="Follows" asp-action="Index" asp-route-id="@userId">
+                Prieteni
+            </a>
     </li>
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">Profilul meu</a>
