@@ -80,3 +80,12 @@ body {
     height: 25%;
     padding-top: 2rem;
 }
+
+.no-underline {
+    text-decoration: none;
+    color: black;
+}
+
+.no-underline:hover{
+    text-decoration: none;
+}

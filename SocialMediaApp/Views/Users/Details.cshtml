@@ -18,7 +18,9 @@
 	}
 	else {
 		if(ViewBag.Accepted == null) {
-			<button type="submit" class="btn btn-outline-primary w-100">Urmărește</button>
+			<form action="/Follows/New/@Model.Id" method="post" class="w-100">
+				<button type="submit" class="btn btn-outline-primary w-100">Urmărește</button>
+			</form>
 		}
 
 		else {

@@ -41,14 +41,13 @@ namespace SocialMediaApp.Controllers
 		}
 
 		// vizualizare profil -> ce vad eu din profilul tau
-		public IActionResult Details()
+		public IActionResult Details(string? id)
 		{
-			var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			
 			if (string.IsNullOrEmpty(id))
 			{
 				return RedirectToAction("Login", "Account");
 			}
-
 
 			// afisez detaliile personale
 
@@ -181,11 +180,23 @@ namespace SocialMediaApp.Controllers
 			}
 
 			try
-			{
+			{	
 				user.FirstName = requestUser.FirstName;
 				user.LastName = requestUser.LastName;
 				user.Description = requestUser.Description;
 				user.UserName = requestUser.UserName;
+				// daca s-a schimbat vizibilitatwa contului, accept toate cererile de urmarire by default
+				if(user.Privacy == true && requestUser.Privacy == false)
+				{
+					//iau toate cererile care il au pe followedId = id
+					var follows = db.Follows.Where(f => f.FollowedId == id && f.Accepted == false).ToList();
+					foreach (var follow in follows)
+					{
+						follow.Accepted = true;
+						follow.Date = DateTime.Now;
+					}
+					db.SaveChanges();
+				}
 				user.Privacy = requestUser.Privacy;
 
 				if (Image != null)
@@ -214,7 +225,7 @@ namespace SocialMediaApp.Controllers
 
 				db.Entry(user).State = EntityState.Modified;
 
-				TempData["message"] = "Profilul a fost editata";
+				TempData["message"] = "Profilul a fost editat";
 				await db.SaveChangesAsync();
 				return Redirect("/Users/Details/" + user.Id);
 			}

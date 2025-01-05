@@ -5,8 +5,12 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var userId = UserManager.GetUserId(User);
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details">Profilul meu</a>
+            <a class="nav-link text-dark bi bi-people-fill" asp-area="" asp-controller="Follows" asp-action="Index" asp-route-id="@userId"></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">Profilul meu</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">

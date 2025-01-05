@@ -1,6 +1,6 @@
 ﻿<div class="mx-auto card w-auto h-auto">
     <div class="card-header button-container">
-        <i class="bi bi-person-circle"> @Model.User.UserName</i>
+        <i class="bi bi-person-circle"> <a href="/Users/Details/@Model.User.Id" class="no-underline">@Model.User.UserName</a></i>
         <i class="bi bi-bookmark-fill"> @Model.Tag.Denumire</i>
     </div>
     @if (@Model.Image != null)
