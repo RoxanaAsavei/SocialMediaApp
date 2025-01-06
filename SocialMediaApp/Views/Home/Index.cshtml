@@ -1,7 +1,107 @@
 ﻿@{
     ViewData["Title"] = "Home";
+	Layout = "_StartLayout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+<style>
+    .start-container {
+        background-image: url('../images/bg_image.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: repeat-y;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .start-text {
+        font-family: "Dancing Script", serif;
+        font-optical-sizing: auto;
+        font-weight: bold;
+        opacity: 1;
+        font-size: 80px;
+        color: whitesmoke;
+        transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+    }
+
+        .start-text.fade-out {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+
+    .buttons-container {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+    }
+
+
+        .buttons-container.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    .start-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .btn-custom-width {
+        width: 50vh;
+    }
+
+    .btn-custom-style {
+        background-color: white;
+        color: #00008B;
+    }
+</style>
+
+<div class="start-container">
+    <div class="text-center start-text" id="welcomeText">
+        <div>Descoperă Kalopsia!</div>
+    </div>
+
+    <div class="d-flex flex-column buttons-container hidden" style="gap: 40px;" id="buttonsContainer">
+        <form asp-controller="Account" asp-action="Register" method="get">
+            <button class="btn btn-custom-style btn-custom-width fw-bold" type="submit">Înregistrează-te</button>
+        </form>
+
+        <form asp-controller="Account" asp-action="Login" method="get">
+            <button class="btn btn-custom-style btn-custom-width fw-bold" type="submit">Conectează-te</button>
+        </form>
+    </div>
 </div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+            var welcomeText = document.getElementById('welcomeText');
+            welcomeText.classList.add('fade-out');
+        }, 3000); // Start fade-out after 3 seconds
+
+        setTimeout(function () {
+            var welcomeText = document.getElementById('welcomeText');
+            welcomeText.classList.add('hidden');
+        }, 4000); // Add hidden class after 4 seconds (1 second after fade-out starts)
+
+        setTimeout(function () {
+            var buttonsContainer = document.getElementById('buttonsContainer');
+            buttonsContainer.classList.remove('hidden');
+            buttonsContainer.classList.add('fade-in');
+        }, 4000); // Show buttons after 4 seconds
+    })
+
+</script>

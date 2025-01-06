@@ -43,7 +43,7 @@ namespace SocialMediaApp.Controllers
 				var result = await _signManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 				if (result.Succeeded)
 				{
-					return RedirectToAction("Index", "Home");
+					return RedirectToAction("Index", "Posts");
 				}
 				else
 				{
