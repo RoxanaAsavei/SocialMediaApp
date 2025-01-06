@@ -1,0 +1,54 @@
+﻿@using SocialMediaApp.ViewModels
+@model LoginViewModel
+
+@{
+
+	ViewData["Title"] = "Conectare"; 
+	Layout = "_AccountLayout";
+}
+
+<div class="account-container">
+	<div class="account-box">
+		<h2 class="text-center mb-4">Conectare</h2>
+		<form asp-controller="Account" asp-action="Login" method="post">
+			<div asp-validation-summary="ModelOnly" class="text-danger">
+			</div>
+			<div class="mb-3">
+				<label asp-for="Email" class="form-label">Email</label>
+				<input asp-for="Email" class="form-control"/>
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="Password" class="form-label">Parolă</label>
+				<input asp-for="Password" class="form-control" />
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+
+
+			<div class="form-check mb-3">
+				<label class="form-check-label">
+					<input asp-for="RememberMe" class="form-check-input"/>
+					@Html.DisplayNameFor(a => a.RememberMe)
+				</label>
+
+			</div>
+
+			<input type="submit" value="Login" class="btn btn-primary w-100 p-2"/>
+			<p class="text-center mt-2">
+				Nu ai cont? <a asp-controller="Account" asp-action="Register" class="text-decoration-none">Crează-ți un cont</a>
+			</p>
+			<div class="text-center">
+				<a asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3">Înapoi</a>
+			</div>
+		</form>
+	</div>
+
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial.cshtml");
+	}
+
+}

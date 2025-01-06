@@ -1,0 +1,41 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> signInManager
+@inject UserManager<ApplicationUser> userManager
+
+<ul class="navbar-nav ms-auto">
+
+	@if(signInManager.IsSignedIn(User))
+	{
+		var userId = userManager.GetUserId(User);
+		<li class="nav-item">
+			<a class="nav-link text-dark bi bi-search" asp-area="" asp-controller="Users" asp-action="Search">
+				Caută
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-dark bi bi-people-fill" asp-area="" asp-controller="Follows" asp-action="Index" asp-route-id="@userId">
+				Prieteni
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">Profilul meu</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Deconectează-te</a>
+		</li>
+	}
+
+	else 
+	{
+		<li class="nav-item">
+			<a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Conectare</a>
+		</li>
+
+		<li class="nav-item">
+			<a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Înregistrare</a>
+		</li>
+	}
+
+
+</ul>
+
