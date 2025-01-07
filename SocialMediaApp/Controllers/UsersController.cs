@@ -74,19 +74,6 @@ namespace SocialMediaApp.Controllers
 			ViewBag.noPosts = noPosts;
 			ViewBag.Posts = posts;
 
-			// daca nu are vizibilitatea profilului setata, o punem pe public
-			if (user.Privacy == null)
-			{
-				user.Privacy = false;
-				db.SaveChanges();
-			}
-
-			// daca nu are imaginea setata, o punem pe default
-			if (user.Image == null)
-			{
-				user.Image = "/images/default_image.jpg";
-				db.SaveChanges();
-			}
 
 			// vad daca il urmaresc / i-am dat follow
 			bool? accepted = db.Follows.
@@ -175,7 +162,10 @@ namespace SocialMediaApp.Controllers
 			}
 
 			if (!ModelState.IsValid)
-			{
+			{	if(Image == null)
+				{
+					requestUser.Image = user.Image;
+				}
 				return View(requestUser);
 			}
 
@@ -184,7 +174,6 @@ namespace SocialMediaApp.Controllers
 				user.FirstName = requestUser.FirstName;
 				user.LastName = requestUser.LastName;
 				user.Description = requestUser.Description;
-				user.UserName = requestUser.UserName;
 				// daca s-a schimbat vizibilitatwa contului, accept toate cererile de urmarire by default
 				if(user.Privacy == true && requestUser.Privacy == false)
 				{
