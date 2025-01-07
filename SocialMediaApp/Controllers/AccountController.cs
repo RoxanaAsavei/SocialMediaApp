@@ -167,11 +167,10 @@ namespace SocialMediaApp.Controllers
 				var user = await _userManager.FindByNameAsync(model.Email);
 				if(user != null)
 				{
-					var result = await _userManager.RemovePasswordAsync(user);
-					//var result = await _userManager.ChangePasswordAsync(user, user.PasswordHash, model.NewPassword);
+	
+					var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 					if (result.Succeeded)
 					{
-						result = await _userManager.AddPasswordAsync(user, model.NewPassword);
 						return RedirectToAction("Login", "Account");
 					}
 

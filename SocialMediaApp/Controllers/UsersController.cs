@@ -245,5 +245,28 @@ namespace SocialMediaApp.Controllers
 			ViewBag.SearchUser = search;
 			return View();
 		}
+
+		public IActionResult Settings(string id)
+		{
+			// luam userul curent si il trimitem ca model
+			ApplicationUser user = db.Users.Find(id);
+			if(user == null)
+			{
+				return NotFound();
+			} 
+				
+			return View(user); 
+		}
+
+		[HttpPost]
+		public IActionResult ChangePassword()
+		{
+			var user = db.Users.Find(_userManager.GetUserId(User));
+			if (user == null)
+			{
+				return NotFound();
+			}
+			return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
+		}
 	}
 }

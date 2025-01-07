@@ -1,0 +1,27 @@
+﻿@model SocialMediaApp.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Setări";
+}
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <div class="card" style="width:75%;">
+        <div class="card-header text-center fs-3 fw-bold bi bi-gear">
+            Setări
+        </div>
+
+        <div class="d-flex flex-column align-items-center justify-content-around" style="gap: 20px; padding:20px;">
+            <div class="row w-100">
+                <div class="col-6 d-flex justify-content-center">
+                    <form method="get" action="/Users/Edit/@Model.Id">
+                        <button class="btn btn-primary bi bi-person-circle w-100" type="submit"> Editează detaliile personale</button>
+                    </form>
+                </div>
+                <div class="col-6 d-flex justify-content-center">
+                    <form method="post" asp-controller="Users" asp-action="ChangePassword">
+                        <button class="btn btn-primary bi bi-lock w-100" type="submit"> Schimbă parola</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

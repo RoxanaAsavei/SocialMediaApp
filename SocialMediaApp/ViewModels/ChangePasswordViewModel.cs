@@ -8,6 +8,10 @@ namespace SocialMediaApp.ViewModels
 		[EmailAddress(ErrorMessage = "Adresa de email nu este validă.")]
 		public string Email { get; set; }
 
+		[Required(ErrorMessage = "Introduceți parola actuală.")]
+		[DataType(DataType.Password)]
+		public string OldPassword { get; set; }
+
 		[Required(ErrorMessage = "Parola este obligatorie.")]
 		[DataType(DataType.Password)]
 		[StringLength(40, ErrorMessage = "Parola trebuie să aibă cel puțin {2} caractere.", MinimumLength = 8)]
