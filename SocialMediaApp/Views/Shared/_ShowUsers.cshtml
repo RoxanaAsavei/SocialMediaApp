@@ -1,0 +1,29 @@
+﻿@if (ViewBag.Users == null || (ViewBag.UsersCt != null && ViewBag.UsersCt == 0))
+{
+	<div class="d-flex justify-content-center align-items-center vh-100">
+		<div class="mb-3 fw-bold fs-1 bi bi-ban">
+			Niciun utilizator găsit
+		</div>
+	</div>
+}
+
+else
+{
+		<div class="d-flex flex-column align-items-center" style="gap: 20px;">
+		@foreach (var user in ViewBag.Users)
+		{
+			<div class="p-card card d-flex flex-row align-items-center w-75" style="padding: 10px; gap: 40px;" id="profileCard" data-user-id="@user.Id">
+				<div>
+					<img class="profile-image" src="@user.Image" />
+				</div>
+				<div>
+					<div class="card-text fs-4">
+						@user.FirstName @user.LastName
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+
+}
+

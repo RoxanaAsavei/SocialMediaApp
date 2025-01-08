@@ -16,6 +16,7 @@ namespace SocialMediaApp.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
+	
 		public AccountController(
 		ApplicationDbContext context,
 		IWebHostEnvironment env,
