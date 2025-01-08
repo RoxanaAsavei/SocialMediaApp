@@ -45,21 +45,7 @@ namespace SocialMediaApp.Controllers
             Group group = new Group();
             return View(group);
         }
-        /*        [HttpPost]
-                public IActionResult New(Group group)
-                {
-                    if(ModelState.IsValid)
-                    {
-                        db.Groups.Add(group);
-                        db.SaveChanges();
-                        TempData["message"] = "Grupul a fost creat";
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        return View(group);
-                    }
-                }*/
+
         [Authorize(Roles = "Moderator,Admin")]
         [HttpPost]
         public async Task<IActionResult> New(Group group, IFormFile? Image)
@@ -199,7 +185,7 @@ namespace SocialMediaApp.Controllers
         }
 
         [HttpPost] // adaugarea postarii cu post -> salvare in baza de date
-        public async Task<IActionResult> New(Post post, IFormFile? Image, int id)
+        public async Task<IActionResult> NewPost(Post post, IFormFile? Image, int id)
         {
 
 			if (User.Identity == null || !User.Identity.IsAuthenticated)
