@@ -11,10 +11,23 @@
    
     }
     <div class="card-body">
-        <i class="bi bi-chat-left-text"> @Model.NrComments</i>
         <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
             @Html.Raw(Model.Continut)
         </p>
+        <hr />
+        <div class="d-flex flex-row justify-content-lg-between">
+            <div>
+                <i class="bi bi-chat-left-text fs-4"></i> 
+                @Model.NrComments
+            </div>
+            
+            <div>
+                <i class="bi bi-heart fs-4"></i>
+                @Model.NrLikes
+            </div>
+           
+        </div>
+       
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item"><i class="bi bi-calendar-check-fill"> @Model.Data.ToString("dd.MM.yyyy, HH:mm")</i></li>

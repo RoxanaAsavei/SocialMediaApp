@@ -17,13 +17,31 @@ namespace SocialMediaApp.Data
         public DbSet<Group> Groups { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<Follow> Follows { get; set; }
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
+		public DbSet<Like> Likes { get; set; }
+		public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // definire primary key compus
-            modelBuilder.Entity<Follow>()
+			// definim structura pentru like
+			modelBuilder.Entity<Like>()
+				.HasKey(l => new { l.PostId, l.UserId });
+
+            modelBuilder.Entity<Like>()
+				.HasOne(l => l.User)
+				.WithMany(u => u.Likes)
+				.HasForeignKey(l => l.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Like>()
+                .HasOne(l => l.Post)
+				.WithMany(p => p.Likes)
+				.HasForeignKey(l => l.PostId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			// definire primary key compus
+			modelBuilder.Entity<Follow>()
 			.HasKey(f => new { f.FollowerId, f.FollowedId });
 
 			modelBuilder.Entity<ApplicationUser>()
