@@ -18,6 +18,7 @@ namespace SocialMediaApp.Models
 
 		public int NrComments { get; set; }
 		public string? Image { get; set; }
+		public string? Video { get; set; }
 
 		public DateTime Data { get; set; }
 

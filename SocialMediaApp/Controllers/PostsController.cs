@@ -179,6 +179,7 @@ namespace SocialMediaApp.Controllers
 				post.Data = DateTime.Now;
 				post.TagId = requestPost.TagId;
 				post.Locatie = requestPost.Locatie;
+				post.Video = requestPost.Video;
 
 				if (Image != null)
 				{

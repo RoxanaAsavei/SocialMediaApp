@@ -3,13 +3,24 @@
         <i class="bi bi-person-circle"> <a href="/Users/Details/@Model.User.Id" class="no-underline">@Model.User.UserName</a></i>
         <i class="bi bi-bookmark-fill"> @Model.Tag.Denumire</i>
     </div>
-    @if (@Model.Image != null)
+
+    <div class="d-flex flex-row card-img-top justify-content-center">
+         @if (@Model.Image != null)
     {
-        <div class="d-flex justify-content-center">
-            <img src=@Model.Image class="card-img-top post-image" alt="imagine atasata">
+        <div>
+            <img src=@Model.Image class="post-image" alt="imagine atasata">
         </div>
    
     }
+
+    @if(@Model.Video != null)
+    {
+        <div>
+            <iframe width="560" height="315" src="@Model.Video" alt="Videoclipul nu poate fi redat"></iframe>
+		</div>
+    }
+    </div>
+
     <div class="card-body">
         <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
             @Html.Raw(Model.Continut)
