@@ -16,15 +16,20 @@
         </p>
         <hr />
         <div class="d-flex flex-row justify-content-lg-between">
-            <div>
-                <i class="bi bi-chat-left-text fs-4"></i> 
-                @Model.NrComments
-            </div>
-            
-            <div>
-                <i class="bi bi-heart fs-4"></i>
-                @Model.NrLikes
-            </div>
+            <form asp-controller="Posts" asp-action="Show" asp-route-id="@Model.Id" method="get">
+                <div>
+                    <button class="btn btn-primary bi bi-chat-left-text fs-5" type="submit"> @Model.NrComments</button>
+
+                </div>
+            </form>
+
+      
+
+            <form asp-controller="Likes" asp-action="Click" asp-route-id="@Model.Id" method="post">
+                <div>
+                    <button class="btn btn-primary bi bi-heart fs-5" type="submit" id="@Model.Id"> @Model.NrLikes</button>
+                </div>
+            </form>
            
         </div>
        

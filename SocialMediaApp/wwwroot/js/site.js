@@ -38,4 +38,21 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = '/Users/Details/' + userId;
         });
     });
+
+
+    function toggleHeartClass(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            if (element.classList.contains('bi-heart')) {
+                element.classList.remove('bi-heart');
+                element.classList.add('bi-heart-fill');
+            }
+
+            else if (element.classList.contains('bi-heart-fill')) {
+                element.classList.remove('bi-heart-fill');
+                element.classList.add('bi-heart');
+            }
+        }
+    }
+
 });
