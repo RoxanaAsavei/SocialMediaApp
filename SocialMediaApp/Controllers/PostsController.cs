@@ -179,6 +179,7 @@ namespace SocialMediaApp.Controllers
 				post.Data = DateTime.Now;
 				post.TagId = requestPost.TagId;
 				post.Locatie = requestPost.Locatie;
+				post.Video = requestPost.Video;
 
 				if (Image != null)
 				{
@@ -243,6 +244,7 @@ namespace SocialMediaApp.Controllers
             var sanitizer = new HtmlSanitizer();
             post.Data = DateTime.Now;
 			post.NrComments = 0;
+			post.NrLikes = 0;
 			post.UserId = _userManager.GetUserId(User);
 
 			if (string.IsNullOrEmpty(post.UserId))

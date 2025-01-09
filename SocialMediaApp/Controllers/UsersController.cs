@@ -236,9 +236,7 @@ namespace SocialMediaApp.Controllers
 				List<string> userIdFirstName = db.ApplicationUsers.Where(usr => usr.FirstName.Contains(search)).Select(u => u.Id).ToList();
 				// luam userii care contin in nume stringul cautat
 				List<string> userIdLastName = db.ApplicationUsers.Where(usr => usr.LastName.Contains(search)).Select(u => u.Id).ToList();
-				// luam userii care contin in username stringul cautat
-				List<string> userIdUserName = db.ApplicationUsers.Where(usr => usr.UserName.Contains(search)).Select(u => u.Id).ToList();
-				List<string> mergedIds = userIdFirstName.Union(userIdLastName).Union(userIdUserName).ToList();
+				List<string> mergedIds = userIdFirstName.Union(userIdLastName).ToList();
 				ViewBag.Users = db.Users.Where(user => mergedIds.Contains(user.Id)).ToList();
 				ViewBag.UsersCt = db.Users.Where(user => mergedIds.Contains(user.Id)).ToList().Count();
 			}
@@ -267,6 +265,36 @@ namespace SocialMediaApp.Controllers
 				return NotFound();
 			}
 			return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
+		}
+
+		[HttpGet]
+		public IActionResult ViewFollowers(string id)
+		{
+			// luam followerii userului
+			var followers = db.Follows
+				.Include(f => f.Follower)
+				.Where(f => f.FollowedId == id && f.Accepted == true)
+				.Select(f => f.Follower)
+				.ToList();
+			ViewBag.Users = followers;
+			ViewBag.UsersCt = followers.Count;
+			return View();
+		}
+
+		[HttpGet]
+		public IActionResult ViewFollowing(string id)
+		{
+			// luam persoanele pe care le urmareste userul
+			var following = db.Follows
+							.Include(f => f.Followed)
+							.Where(f => f.FollowerId == id && f.Accepted == true)
+							.Select(f => f.Followed)
+							.ToList();
+			ViewBag.Users = following;
+			ViewBag.UsersCt = following.Count();
+			ViewBag.Title = id == _userManager.GetUserId(User) ? "Urmărești" : "Urmărește";
+
+			return View();
 		}
 	}
 }

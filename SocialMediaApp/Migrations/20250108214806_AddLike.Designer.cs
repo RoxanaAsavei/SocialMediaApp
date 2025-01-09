@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaApp.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaApp.Data;
 namespace SocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250108214806_AddLike")]
+    partial class AddLike
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,7 +325,6 @@ namespace SocialMediaApp.Migrations
                     b.ToTable("Groups");
                 });
 
-
             modelBuilder.Entity("SocialMediaApp.Models.Like", b =>
                 {
                     b.Property<int?>("PostId")
@@ -336,31 +338,6 @@ namespace SocialMediaApp.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Likes");
-                    
-                    });
-
-            modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("GroupModerators");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
@@ -392,17 +369,11 @@ namespace SocialMediaApp.Migrations
                     b.Property<int>("NrComments")
                         .HasColumnType("int");
 
-                    b.Property<int>("NrLikes")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TagId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Video")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -547,47 +518,24 @@ namespace SocialMediaApp.Migrations
                     b.Navigation("Follower");
                 });
 
+            modelBuilder.Entity("SocialMediaApp.Models.Like", b =>
+                {
+                    b.HasOne("SocialMediaApp.Models.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
- modelBuilder.Entity("SocialMediaApp.Models.Like", b =>
-{
-    b.HasOne("SocialMediaApp.Models.Post", "Post")
-        .WithMany("Likes")
-        .HasForeignKey("PostId")
-        .OnDelete(DeleteBehavior.Cascade)
-        .IsRequired();
+                    b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-    b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
-        .WithMany("Likes")
-        .HasForeignKey("UserId")
-        .OnDelete(DeleteBehavior.Cascade)
-        .IsRequired();
+                    b.Navigation("Post");
 
-    b.Navigation("Post");
-    b.Navigation("User");
-});
-
-
-modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
-{
-    b.HasOne("SocialMediaApp.Models.Group", "Group")
-        .WithMany("Moderators")
-        .HasForeignKey("GroupId")
-        .OnDelete(DeleteBehavior.Cascade)
-        .IsRequired();
-
-    b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
-        .WithMany("ModeratedGroups")
-        .HasForeignKey("UserId")
-        .OnDelete(DeleteBehavior.Cascade)
-        .IsRequired();
-
-    b.Navigation("Group");
-    b.Navigation("User");
-});
-
-
-                
-                
+                    b.Navigation("User");
+                });
 
             modelBuilder.Entity("SocialMediaApp.Models.Post", b =>
                 {
@@ -652,7 +600,6 @@ modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
                     b.Navigation("Following");
 
                     b.Navigation("Likes");
-                    b.Navigation("ModeratedGroups");
 
                     b.Navigation("Posts");
 
@@ -663,8 +610,6 @@ modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
 
             modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
                 {
-                    b.Navigation("Moderators");
-
                     b.Navigation("Posts");
 
                     b.Navigation("UserGroups");

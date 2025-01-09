@@ -5,11 +5,27 @@
 	<div class="profile-title"><b>@Model.FirstName @Model.LastName</b></div>
 	<div class="card-text">@Model.Description</div>
 
-	<div class="btn-group w-100 d-flex"  aria-label="Basic example">
-		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noFollowers Followers</button>
-		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noPosts Posts</button>
-		<button type="button" class="btn btn-outline-success flex-fill"> @ViewBag.noFollowing Following</button>
+	<div class="d-flex justify-content-center">
+		<div class="w-100 d-flex" style="gap: 10px;">
+			<div>
+				<form asp-action="ViewFollowers" asp-controller="Users" asp-route-id="@Model.Id" method="get">
+					<button type="submit" class="btn btn-outline-success"> @ViewBag.noFollowers Followers</button>
+				</form>
+			</div>
+
+			<div>
+				<button type="button" class="btn btn-outline-success"> @ViewBag.noPosts Posts</button>
+			</div>
+
+			<div>
+				<form type="submit" asp-action="ViewFollowing" asp-controller="Users" asp-route-id="@Model.Id" method="get">
+					<button type="submit" class="btn btn-outline-success"> @ViewBag.noFollowing Following</button>
+				</form>
+			</div>
+
+		</div>
 	</div>
+
 
 	@if(ViewBag.IsMe == true) {
 		<form action="/Users/Settings/@Model.Id" method="get" class="w-100">
