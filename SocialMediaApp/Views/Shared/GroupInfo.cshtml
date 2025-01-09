@@ -1,14 +1,12 @@
-﻿<div class="mx-auto card" style="width: 38rem;">
-    <div class="card-header button-container">
-        <i class="bi bi-people-fill">@Model.Nume</i>
+﻿<div class="card mx-auto mb-4" style="width: 100%;">
+    <div class="card-header">
+        <i class="bi bi-people-fill"></i> @Model.Nume
     </div>
     @if (@Model.Fotografie != null)
     {
-        <img src=@Model.Fotografie class="card-img-top" alt="imagine atasata">
+        <div class="d-flex justify-content-center">
+            <img src=@Model.Fotografie class="card-img-top post-image" alt="imagine atasata">
+        </div>
+
     }
-    <div class="card-body">
-        <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-            @Html.Raw(Model.Descriere)
-        </p>
-    </div>
 </div>

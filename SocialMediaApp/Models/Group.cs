@@ -16,5 +16,6 @@ namespace SocialMediaApp.Models
 		// de vazut ce facem cu moderatorul care creeaza grupul
 		virtual public ICollection<UserGroup>? UserGroups { get; set; }
 		virtual public ICollection<Post>? Posts { get; set; }
-	}
+        public virtual ICollection<GroupModerator>? Moderators { get; set; }
+    }
 }

@@ -35,7 +35,6 @@ namespace SocialMediaApp.Models
 		// tinem minte rolurile 
 		[NotMapped]
 		public IEnumerable<SelectListItem>? AllRoles { get; set; }
-
-
-	}
+        public virtual ICollection<GroupModerator>? ModeratedGroups { get; set; }
+    }
 }
