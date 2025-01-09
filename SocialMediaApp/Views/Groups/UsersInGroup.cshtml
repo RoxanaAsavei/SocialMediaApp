@@ -1,0 +1,38 @@
+﻿@model SocialMediaApp.Models.Group
+
+<h1>Utilizatorii din grupul @Model.Nume</h1>
+<br />
+<hr />
+<br />
+
+@if (Model.UserGroups != null && Model.UserGroups.Any())
+{
+    <ul class="list-group">
+        @foreach (var userGroup in Model.UserGroups)
+        {
+            <li class="list-group-item">
+                <a href="/Users/Details/@userGroup.UserId" class="user-link">
+                    <strong>@userGroup.User.UserName</strong> (@userGroup.User.Email)
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No users in this group.</p>
+}
+
+<br />
+<a href="/Groups/Show/@Model.Id" class="btn btn-secondary">Back to Group</a>
+
+<style>
+    .user-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    .user-link:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>

@@ -31,13 +31,80 @@ namespace SocialMediaApp.Controllers
             _roleManager = roleManager;
         }
         [Authorize(Roles = "User,Moderator,Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var grupuri = from item in db.Groups
-                          select item;
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var grupuri = db.Groups
+                            .Include(g => g.UserGroups)
+                            .Include(g => g.Moderators)
+                            .ToList();
+            var userGroups = db.UserGroups.Where(ug => ug.UserId == userId).Select(ug => ug.GroupId).ToList();
+            var moderatedGroups = db.GroupModerators.Where(gm => gm.UserId == userId).Select(gm => gm.GroupId).ToList();
             ViewBag.Groups = grupuri;
+            ViewBag.UserGroups = userGroups;
+            ViewBag.ModeratedGroups = moderatedGroups;
+            ViewBag.UserRoles = userRoles;
             return View();
         }
+
+        [Authorize(Roles = "User,Moderator,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Join(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var existingMembership = db.UserGroups.FirstOrDefault(ug => ug.UserId == userId && ug.GroupId == id);
+            if (existingMembership == null)
+            {
+                var userGroup = new UserGroup
+                {
+                    UserId = userId,
+                    GroupId = id
+                };
+                db.UserGroups.Add(userGroup);
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "User,Moderator,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Leave(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var isModerator = await db.GroupModerators.AnyAsync(gm => gm.UserId == userId && gm.GroupId == id);
+            if (isModerator)
+            {
+                TempData["ErrorMessage"] = "Moderatorii nu pot sa paraseasca grupul";
+                return RedirectToAction("Index");
+            }
+            var existingMembership = db.UserGroups.FirstOrDefault(ug => ug.UserId == userId && ug.GroupId == id);
+            if (existingMembership != null)
+            {
+                db.UserGroups.Remove(existingMembership);
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "User,Moderator,Admin")]
+        public async Task<IActionResult> UsersInGroup(int id)
+        {
+            var group = await db.Groups
+                .Include(g => g.UserGroups)
+                .ThenInclude(ug => ug.User)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            return View(group);
+        }
+
 
         [HttpGet]
         public IActionResult New()
@@ -48,58 +115,78 @@ namespace SocialMediaApp.Controllers
 
         [Authorize(Roles = "Moderator,Admin")]
         [HttpPost]
-        public async Task<IActionResult> New(Group group, IFormFile? Image)
+        public async Task<IActionResult> New(Group group, IFormFile? Fotografie)
         {
             if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 ModelState.AddModelError("UserId", "User must be logged in to create a post.");
                 return View(group);
             }
-
-            /*            group.UserId = _userManager.GetUserId(User);
-
-                        if (string.IsNullOrEmpty(group.UserId))
-                        {
-                            ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-                            return View(group);
-                        }*/
-
-            if (Image != null && Image.Length > 0)
+            if (Fotografie != null && Fotografie.Length > 0)
             {
-                // Verificăm extensia
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
-                var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+                var fileExtension = Path.GetExtension(Fotografie.FileName).ToLower();
                 if (!allowedExtensions.Contains(fileExtension))
                 {
                     ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
                     return View(group);
                 }
-
-                // Cale stocare
-                var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
-                var databaseFileName = "/images/" + Image.FileName;
-
-                // Salvare fișier
+                var storagePath = Path.Combine(_env.WebRootPath, "images", Fotografie.FileName);
+                var databaseFileName = "/images/" + Fotografie.FileName;
                 using (var fileStream = new FileStream(storagePath, FileMode.Create))
                 {
-                    await Image.CopyToAsync(fileStream);
+                    await Fotografie.CopyToAsync(fileStream);
                 }
                 ModelState.Remove(nameof(group.Fotografie));
                 group.Fotografie = databaseFileName;
             }
             if (TryValidateModel(group))
             {
-                // Adăugare articol
                 db.Groups.Add(group);
+                await db.SaveChangesAsync();
+                var userId = _userManager.GetUserId(User);
+                var groupModerator = new GroupModerator
+                {
+                    UserId = userId,
+                    GroupId = group.Id
+                };
+                db.GroupModerators.Add(groupModerator);
+                var userGroup = new UserGroup
+                {
+                    UserId = userId,
+                    GroupId = group.Id
+                };
+                db.UserGroups.Add(userGroup);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index", "Groups");
             }
             return View(group);
         }
         [Authorize(Roles = "User,Moderator,Admin")]
-        public IActionResult Show(int id)
+        public async Task<IActionResult> Show(int id)
         {
-            Group group = db.Groups.Find(id);
+            var group = await db.Groups
+                .Include(g => g.UserGroups)
+                .ThenInclude(ug => ug.User)
+                .Include(g => g.Posts)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            var creator = await db.GroupModerators
+                .Where(gm => gm.GroupId == id)
+                .OrderBy(gm => gm.Id)
+                .FirstOrDefaultAsync();
+
+            var isCreator = creator != null && creator.UserId == userId;
+            ViewBag.CanDeleteGroup = isAdmin || isCreator;
+
             return View(group);
         }
 

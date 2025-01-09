@@ -5,31 +5,17 @@
 <hr />
 <br />
 
-<div class="mx-auto card" style="width: 38rem;">
-    <div class="card-header button-container">
-        <i class="bi bi-person-circle"> @Model.Nume</i>
-    </div>
-    @if (@Model.Fotografie != null)
-    {
-        <img src=@Model.Fotografie class="card-img-top" alt="imagine atasata">
-    }
-    <div class="card-body">
-        <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-            @Html.Raw(Model.Descriere)
-        </p>
-    </div>
-</div>
+<partial name="GroupInfo" model="Model" />
 
 <br />
 <hr />
 <div class="d-flex flex-row justify-content-between">
-
-    <form method="group" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
-
-        <button class="btn btn-danger" type="submit">Sterge grup</button>
-
-    </form>
-
+    @if (ViewBag.CanDeleteGroup)
+    {
+        <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
+            <button class="btn btn-danger" type="submit">Sterge grup</button>
+        </form>
+    }
 </div>
 <hr />
 <br />
@@ -73,7 +59,7 @@ else
 
 @* else *@
 
-<button type="submit"> <a href="/Groups/Index">Vizualizeaza toti utilizatorii din grup</a></button>
+<button type="submit"> <a href="/Groups/UsersinGroup/@Model.Id">Vizualizeaza toti utilizatorii din grup</a></button>
 <br />
 <br />
 <button type="submit"> <a href="/Groups/Index">Inapoi</a></button>

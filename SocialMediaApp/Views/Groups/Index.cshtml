@@ -1,25 +1,48 @@
-﻿﻿@{
+﻿@{
     ViewBag.Title = "Afisarea grupurilor";
 }
-
 
 <h2>@ViewBag.Title</h2>
 <br />
 
-@foreach (SocialMediaApp.Models.Group group in ViewBag.Groups)
-{
-    <partial name="GroupInfo" model="group" />
-    <a href="/Groups/Show/@group.Id">Vezi mai mult</a>
-    <br />
-    <a href="/Groups/Edit/@group.Id">Editare grup</a>
-    <form action="/Groups/Join/@group.Id" method="post" class="d-inline-block">
-
-        <button class="btn btn-outline-primary" type="submit"> JOIN</button>
-
-    </form>
-}
+<div class="row">
+    @foreach (SocialMediaApp.Models.Group group in ViewBag.Groups)
+    {
+        var isMember = ViewBag.UserGroups.Contains(group.Id) || ViewBag.ModeratedGroups.Contains(group.Id);
+        var isModeratorOrAdmin = ViewBag.ModeratedGroups.Contains(group.Id) || ViewBag.UserRoles.Contains("Admin");
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <partial name="GroupInfo" model="group" />
+                <div class="card-body">
+                    <h5 class="card-title">@group.Nume</h5>
+                    <p class="card-text">@group.Descriere</p>
+                    <a href="/Groups/Show/@group.Id" class="btn btn-primary">Vezi mai mult</a>
+                    @if (isModeratorOrAdmin)
+                    {
+                        <a href="/Groups/Edit/@group.Id" class="btn btn-secondary">Editare grup</a>
+                    }
+                    @if (isMember)
+                    {
+                        @if (!ViewBag.ModeratedGroups.Contains(group.Id))
+                        {
+                            <form action="/Groups/Leave/@group.Id" method="post" class="d-inline-block">
+                                <button class="btn btn-danger" type="submit"><i class="bi bi-x-circle"></i> Leave</button>
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        <form action="/Groups/Join/@group.Id" method="post" class="d-inline-block">
+                            <button class="btn btn-outline-primary" type="submit">JOIN</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 <br />
 <br />
 
-<a href="/Groups/New">Grup nou</a>
+<a href="/Groups/New" class="btn btn-success">Grup nou</a>
