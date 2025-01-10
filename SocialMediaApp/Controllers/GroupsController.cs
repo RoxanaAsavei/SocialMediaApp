@@ -263,81 +263,6 @@ namespace SocialMediaApp.Controllers
                 return View(requestGroup);
             }
         }
-
-        [HttpGet] // adaugarea postarii cu get -> formular
-        public IActionResult AddPostToGroup()
-        {
-            Post post = new Post();
-            return View(post);
-        }
-
-        [HttpPost] // adaugarea postarii cu post -> salvare in baza de date
-        public async Task<IActionResult> NewPost(Post post, IFormFile? Image, int id)
-        {
-
-			if (User.Identity == null || !User.Identity.IsAuthenticated)
-			{
-				ModelState.AddModelError("UserId", "User must be logged in to create a post.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-			var sanitizer = new HtmlSanitizer();
-			post.Data = DateTime.Now;
-			post.NrComments = 0;
-			post.UserId = _userManager.GetUserId(User);
-            post.GroupId = id;
-
-			if (string.IsNullOrEmpty(post.UserId))
-			{
-				ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (post.TagId == null)
-			{
-				ModelState.AddModelError("TagId", "Tag is required.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (Image != null && Image.Length > 0)
-			{
-				// Verificăm extensia
-				var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
-				var fileExtension = Path.GetExtension(Image.FileName).ToLower();
-				if (!allowedExtensions.Contains(fileExtension))
-				{
-					ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
-					post.Tags = GetAllTags();
-					return View(post);
-				}
-
-				// Cale stocare
-				var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
-				var databaseFileName = "/images/" + Image.FileName;
-
-				// Salvare fișier
-				using (var fileStream = new FileStream(storagePath, FileMode.Create))
-				{
-					await Image.CopyToAsync(fileStream);
-				}
-				ModelState.Remove(nameof(post.Image));
-				post.Image = databaseFileName;
-			}
-			if (TryValidateModel(post))
-			{
-				post.Continut = sanitizer.Sanitize(post.Continut);
-				// Adăugare postare
-				db.Posts.Add(post);
-				await db.SaveChangesAsync();
-				return RedirectToAction("Index", "Posts");
-			}
-			post.Tags = GetAllTags();
-			return View(post);
-		}
-
-
 		[NonAction]
 		public IEnumerable<SelectListItem> GetAllTags()
 		{
@@ -353,9 +278,7 @@ namespace SocialMediaApp.Controllers
 					Text = tag.Denumire
 				});
 			}
-
 			return selectList;
 		}
-
 	}
 }
