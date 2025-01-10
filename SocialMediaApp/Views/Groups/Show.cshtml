@@ -62,4 +62,10 @@ else
 <button type="submit"> <a href="/Groups/UsersinGroup/@Model.Id">Vizualizeaza toti utilizatorii din grup</a></button>
 <br />
 <br />
+@if (User.IsInRole("Moderator") || User.IsInRole("Admin"))
+{
+    <a asp-action="JoinRequests" asp-route-groupId="@Model.Id" class="btn btn-primary">View Join Requests</a>
+}
+<br />
+<br />
 <button type="submit"> <a href="/Groups/Index">Inapoi</a></button>

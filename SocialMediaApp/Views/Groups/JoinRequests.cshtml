@@ -1,0 +1,34 @@
+﻿@model IEnumerable<SocialMediaApp.Models.Join>
+
+@{
+    ViewBag.Title = "Join Requests";
+}
+
+<h2>Join Requests for Group @ViewBag.GroupId</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.User.UserName</td>
+                <td>
+                    <form asp-action="AcceptJoinRequest" method="post">
+                        <input type="hidden" name="joinId" value="@request.Id" />
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
+                    <form asp-action="DeclineJoinRequest" method="post">
+                        <input type="hidden" name="joinId" value="@request.Id" />
+                        <button type="submit" class="btn btn-danger">Decline</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
