@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 
@@ -51,5 +52,20 @@ namespace SocialMediaApp.Controllers
 			db.SaveChanges();
 			return RedirectToAction("Index", "Posts");
 		}
+
+
+		[HttpGet]
+		public IActionResult ShowLikes(int id)
+		{
+			// luam toti userii care au dat like la postare
+			var users = db.ApplicationUsers
+						  .Where(u => u.Likes.Any(l => l.PostId == id))
+						  .Include(u => u.Likes)
+						  .ToList();
+			ViewBag.Users = users;
+			ViewBag.UsersCt = users.Count();
+			return View();
+		}
+
 	}
 }

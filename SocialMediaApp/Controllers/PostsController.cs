@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 
 namespace SocialMediaApp.Controllers
 {
@@ -18,25 +19,60 @@ namespace SocialMediaApp.Controllers
 		private readonly IWebHostEnvironment _env;
 		private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+		private readonly SignInManager<ApplicationUser> _signInManager;
         public PostsController(
         ApplicationDbContext context,
 		IWebHostEnvironment env,
 		UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+		SignInManager<ApplicationUser> signInManager
         )
         {
             db = context;
 			_env = env;
             _userManager = userManager;
             _roleManager = roleManager;
+			_signInManager = signInManager;
         }
-        [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Index()
-        {
-            var postari = db.Posts.Include("Comments")
-                                    .Include("Tag")
-                                    .Include("User")
-                                    .OrderByDescending(a => a.Data);
+        {	
+			// daca nu e signed in, luam postarile persoanelor care au cont public
+			var postari = db.Posts.Include("Comments")
+						.Include("Tag")
+						.Include("User")
+						.Where(p => p.User.Privacy == false)
+						.OrderByDescending(a => a.Data);
+
+			if (_signInManager.IsSignedIn(User)) // luam postarile persoanelor pe care le urmareste
+			// + postarile lui
+			{	// daca e admin luam toate postarile, indiferent 
+				// daca contul e privat sau public
+				if(User.IsInRole("Admin"))
+				{
+					postari = db.Posts.Include("Comments")
+						.Include("Tag")
+						.Include("User")
+						.OrderByDescending(a => a.Data);
+				}
+
+				else
+				{
+					// luam id-ul userului
+					var id = _userManager.GetUserId(User);
+					// luam lista oamenilor pe care ii urmareste
+					List<string> following = db.Follows
+													 .Where(f => f.FollowerId == id)
+													 .Select(f => f.FollowedId)
+													 .ToList();
+					// luam postarile facute de oamenii pe care ii urmareste
+					postari = db.Posts.Include("Comments")
+						   .Include("Tag")
+						   .Include("User")
+						   .Where(p => following.Contains(p.UserId) || p.UserId == id)
+						   .OrderByDescending(a => a.Data);
+				} 
+					
+			}
 
 
             var search = HttpContext.Request.Query["search"].ToString().Trim();

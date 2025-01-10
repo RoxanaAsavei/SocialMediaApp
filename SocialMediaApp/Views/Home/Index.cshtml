@@ -90,18 +90,18 @@
         setTimeout(function () {
             var welcomeText = document.getElementById('welcomeText');
             welcomeText.classList.add('fade-out');
-        }, 3000); // Start fade-out after 3 seconds
+        }, 2000); // Start fade-out after 3 seconds
 
         setTimeout(function () {
             var welcomeText = document.getElementById('welcomeText');
             welcomeText.classList.add('hidden');
-        }, 4000); // Add hidden class after 4 seconds (1 second after fade-out starts)
+        }, 3000); // Add hidden class after 4 seconds (1 second after fade-out starts)
 
         setTimeout(function () {
             var buttonsContainer = document.getElementById('buttonsContainer');
             buttonsContainer.classList.remove('hidden');
             buttonsContainer.classList.add('fade-in');
-        }, 4000); // Show buttons after 4 seconds
+        }, 3000); // Show buttons after 4 seconds
     })
 
 </script>

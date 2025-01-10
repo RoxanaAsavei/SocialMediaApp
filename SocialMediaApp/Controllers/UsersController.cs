@@ -296,5 +296,57 @@ namespace SocialMediaApp.Controllers
 
 			return View();
 		}
+
+		[HttpPost]
+		public async Task<IActionResult> Delete (string id)
+		{
+			// stergem toate like-urile userului
+			var likes = db.Likes.Where(l => l.UserId == id).ToList();
+			foreach(var like in likes)
+			{
+				db.Likes.Remove(like);
+			}
+			// stergem toate follow-urile userului
+			var follows = db.Follows
+									.Where(f => f.FollowerId == id || f.FollowedId == id)
+									.ToList();
+			foreach (var follow in follows)
+			{
+				db.Follows.Remove(follow);
+			}
+			// stergem toate comentariile userului
+			var comments = db.Comments.Where(c => c.UserId == id).ToList();
+			foreach (var comment in comments)
+			{
+				db.Comments.Remove(comment);
+			}
+			// stergem toate postarile userului
+			var posts = db.Posts.Where(p => p.UserId == id).ToList();
+			foreach (var post in posts)
+			{
+				db.Posts.Remove(post);
+			}
+
+			// ?? stergem toate grupurile moderate de user ??
+			//var moderatedGroups = db.GroupModerators.Where(gm => gm.UserId == id).ToList();
+			//foreach (var moderatedGroup in moderatedGroups)
+			//{
+			//	db.GroupModerators.Remove(moderatedGroup);
+			//}
+
+			// il stergem din grupurile unde era membru
+			var userGroups = db.UserGroups.Where(ug => ug.UserId == id).ToList();
+			foreach (var userGroup in userGroups)
+			{
+				db.UserGroups.Remove(userGroup);
+			}
+
+			// stergem userul
+			var user = db.Users.Find(id);
+			db.Users.Remove(user);
+			await db.SaveChangesAsync();
+			return RedirectToAction("Index", "Posts");
+		}
+
 	}
 }
