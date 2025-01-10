@@ -97,8 +97,7 @@ namespace SocialMediaApp.Controllers
 					UserName = model.Email,
 					Image = databaseFileName,
 					Description = model.Description,
-					Privacy = model.Privacy,
-					EmailConfirmed = true
+					Privacy = model.Privacy
 				};
 
 				var result = await _userManager.CreateAsync(user, model.Password);

@@ -11,6 +11,9 @@ namespace SocialMediaApp.Models
 		public virtual ICollection<Comment>? Comments { get; set; }
 		public virtual ICollection<Tag>? Tags { get; set; }	
 		public virtual ICollection<Post>? Posts { get; set; }
+		public virtual ICollection<Follow>? Followers { get; set; }
+		public virtual ICollection<Follow>? Following { get; set; }
+		public virtual ICollection<Like>? Likes { get; set; }
 
 		[Required(ErrorMessage = "Adaugă o scurtă descriere.")]
 		[StringLength(100, ErrorMessage = "Descrierea trebuie să aibă cel puțin {2} caractere.", MinimumLength = 5)]
@@ -27,10 +30,6 @@ namespace SocialMediaApp.Models
 		public bool Privacy { get; set; } // true -> private account
 							  // false -> public account
 
-		public virtual ICollection<Follow>? Followers { get; set; }
-		public virtual ICollection<Follow>? Following { get; set; }
-
-		public virtual ICollection<Like>? Likes { get; set; }
 
 		// tinem minte rolurile 
 		[NotMapped]
