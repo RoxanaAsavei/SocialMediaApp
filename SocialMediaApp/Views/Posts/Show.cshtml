@@ -129,8 +129,19 @@
 
 </div>
 
-<form action="/Posts/Index">    
-    <button class="btn btn-outline-dark" type="submit">
-        <i class="bi bi-arrow-left"></i> Inapoi
-    </button>
-</form>
+@if (Model.GroupId != null)
+{
+    <form action="/Groups/Show/@Model.GroupId">
+        <button class="btn btn-outline-dark" type="submit">
+            <i class="bi bi-arrow-left"></i> Inapoi
+        </button>
+    </form>
+}
+else
+{
+    <form action="/Posts/Index">
+        <button class="btn btn-outline-dark" type="submit">
+            <i class="bi bi-arrow-left"></i> Inapoi
+        </button>
+    </form>
+}
