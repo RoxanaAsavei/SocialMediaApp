@@ -35,45 +35,44 @@ namespace SocialMediaApp.Controllers
 			_signInManager = signInManager;
         }
         public IActionResult Index()
-        {	
-			// daca nu e signed in, luam postarile persoanelor care au cont public
-			var postari = db.Posts.Include("Comments")
-						.Include("Tag")
-						.Include("User")
-						.Where(p => p.User.Privacy == false)
-						.OrderByDescending(a => a.Data);
+        {
+            // daca nu e signed in, luam postarile persoanelor care au cont public
+            var postari = db.Posts.Include("Comments")
+                        .Include("Tag")
+                        .Include("User")
+                        .Where(p => p.User.Privacy == false && p.GroupId == null) // Exclude posts with a non-null GroupId
+                        .OrderByDescending(a => a.Data);
 
-			if (_signInManager.IsSignedIn(User)) // luam postarile persoanelor pe care le urmareste
-			// + postarile lui
-			{	// daca e admin luam toate postarile, indiferent 
-				// daca contul e privat sau public
-				if(User.IsInRole("Admin"))
-				{
-					postari = db.Posts.Include("Comments")
-						.Include("Tag")
-						.Include("User")
-						.OrderByDescending(a => a.Data);
-				}
-
-				else
-				{
-					// luam id-ul userului
-					var id = _userManager.GetUserId(User);
-					// luam lista oamenilor pe care ii urmareste
-					List<string> following = db.Follows
-													 .Where(f => f.FollowerId == id)
-													 .Select(f => f.FollowedId)
-													 .ToList();
-					// luam postarile facute de oamenii pe care ii urmareste
-					postari = db.Posts.Include("Comments")
-						   .Include("Tag")
-						   .Include("User")
-						   .Where(p => following.Contains(p.UserId) || p.UserId == id)
-						   .OrderByDescending(a => a.Data);
-				} 
-					
-			}
-
+            if (_signInManager.IsSignedIn(User)) // luam postarile persoanelor pe care le urmareste
+                                                 // + postarile lui
+            {
+                // daca e admin luam toate postarile, indiferent 
+                // daca contul e privat sau public
+                if (User.IsInRole("Admin"))
+                {
+                    postari = db.Posts.Include("Comments")
+                        .Include("Tag")
+                        .Include("User")
+                        .Where(p => p.GroupId == null) // Exclude posts with a non-null GroupId
+                        .OrderByDescending(a => a.Data);
+                }
+                else
+                {
+                    // luam id-ul userului
+                    var id = _userManager.GetUserId(User);
+                    // luam lista oamenilor pe care ii urmareste
+                    List<string> following = db.Follows
+                                                     .Where(f => f.FollowerId == id)
+                                                     .Select(f => f.FollowedId)
+                                                     .ToList();
+                    // luam postarile facute de oamenii pe care ii urmareste
+                    postari = db.Posts.Include("Comments")
+                           .Include("Tag")
+                           .Include("User")
+                           .Where(p => (following.Contains(p.UserId) || p.UserId == id) && p.GroupId == null) // Exclude posts with a non-null GroupId
+                           .OrderByDescending(a => a.Data);
+                }
+            }
 
             var search = HttpContext.Request.Query["search"].ToString().Trim();
             if (!string.IsNullOrEmpty(search))
@@ -83,7 +82,7 @@ namespace SocialMediaApp.Controllers
                     .Where(c => c.Continut.Contains(search))
                     .Select(c => (int)c.PostId).ToList();
                 List<int> mergedIds = postIds.Union(articleIdsOfCommentsWithSearchString).ToList();
-                postari = db.Posts.Where(postare => mergedIds.Contains(postare.Id))
+                postari = db.Posts.Where(postare => mergedIds.Contains(postare.Id) && postare.GroupId == null) // Exclude posts with a non-null GroupId
                                   .Include("Comments")
                                   .Include("Tag")
                                   .Include("User")
@@ -116,11 +115,12 @@ namespace SocialMediaApp.Controllers
                 ViewBag.PaginationBaseUrl = "/Posts/Index?page=";
             }
 
-			SetAccessRights();
-			return View();
+            SetAccessRights();
+            return View();
         }
 
-		public IActionResult Show(int id)
+
+        public IActionResult Show(int id)
 		{
 			Post post = db.Posts.Include("Tag")
 						.Include("Comments").Include("User")
@@ -256,16 +256,17 @@ namespace SocialMediaApp.Controllers
 			}
 		}
 
-
-
-		// new cu get - afisarea formularului
-		[HttpGet]
-		public IActionResult New()
-		{
-			Post post = new Post();
-			post.Tags = GetAllTags();
-			return View(post);
-		}
+        [HttpGet]
+        public IActionResult New(int? groupId = null)
+        {
+            var post = new Post
+            {
+                GroupId = groupId,
+                Tags = GetAllTags()
+            };
+			ViewBag.Tags = GetAllTags();
+            return View(post);
+        }
 
         [Authorize(Roles = "User,Moderator,Admin")]
         [HttpPost]
@@ -327,7 +328,11 @@ namespace SocialMediaApp.Controllers
                 // Adăugare postare
                 db.Posts.Add(post);
 				await db.SaveChangesAsync();
-				return RedirectToAction("Index", "Posts");
+                if (post.GroupId.HasValue)
+                {
+                    return RedirectToAction("Show", "Groups", new { id = post.GroupId.Value });
+                }
+                return RedirectToAction("Index", "Posts");
             }
 			post.Tags = GetAllTags();
 			return View(post);
@@ -346,7 +351,11 @@ namespace SocialMediaApp.Controllers
             }
             db.Posts.Remove(post);
 			db.SaveChanges();
-			return RedirectToAction("Index");
+            if (post.GroupId.HasValue)
+            {
+                return RedirectToAction("Show", "Groups", new { id = post.GroupId.Value });
+            }
+            return RedirectToAction("Index");
 		}
 
 		[NonAction]

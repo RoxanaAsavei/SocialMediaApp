@@ -21,7 +21,8 @@ namespace SocialMediaApp.Data
 
 		public DbSet<Like> Likes { get; set; }
 		public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<Join> Joins { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 

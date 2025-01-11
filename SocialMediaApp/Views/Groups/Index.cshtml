@@ -1,5 +1,6 @@
-﻿@{
+﻿﻿@{
     ViewBag.Title = "Afisarea grupurilor";
+    var userId = ViewBag.UserId;
 }
 
 <h2>@ViewBag.Title</h2>
@@ -32,9 +33,18 @@
                     }
                     else
                     {
-                        <form action="/Groups/Join/@group.Id" method="post" class="d-inline-block">
-                            <button class="btn btn-outline-primary" type="submit">JOIN</button>
-                        </form>
+                        var joinRequests = (IEnumerable<Join>)ViewBag.JoinRequests;
+                        var joinRequestPending = joinRequests.Any(j => j.GroupId == group.Id && j.UserId == userId && j.Accepted == false);
+                        if (!joinRequestPending)
+                        {
+                            <form action="/Groups/Join/@group.Id" method="post" class="d-inline-block">
+                                <button class="btn btn-outline-primary" type="submit">JOIN</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-secondary" disabled>Join Request Pending</button>
+                        }
                     }
                 </div>
             </div>

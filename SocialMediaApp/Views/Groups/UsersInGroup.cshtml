@@ -1,4 +1,4 @@
-﻿@model SocialMediaApp.Models.Group
+﻿@* @model SocialMediaApp.Models.Group
 
 <h1>Utilizatorii din grupul @Model.Nume</h1>
 <br />
@@ -35,4 +35,56 @@ else
         text-decoration: underline;
         cursor: pointer;
     }
+</style> *@
+@model SocialMediaApp.Models.Group
+
+@{
+    var userId = ViewBag.UserId;
+    var isModeratorOrAdmin = ViewBag.ModeratedGroups.Contains(Model.Id) || ViewBag.UserRoles.Contains("Admin");
+}
+
+<h1>Utilizatorii din grupul @Model.Nume</h1>
+<br />
+<hr />
+<br />
+
+@if (Model.UserGroups != null && Model.UserGroups.Any())
+{
+    <ul class="list-group">
+        @foreach (var userGroup in Model.UserGroups)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="/Users/Details/@userGroup.UserId" class="user-link">
+                    <strong>@userGroup.User.UserName</strong> (@userGroup.User.Email)
+                </a>
+                @if (isModeratorOrAdmin && userGroup.UserId != userId)
+                {
+                    <form action="/Groups/RemoveUser" method="post" class="d-inline-block">
+                        <input type="hidden" name="groupId" value="@Model.Id" />
+                        <input type="hidden" name="userId" value="@userGroup.UserId" />
+                        <button class="btn btn-danger" type="submit">Sterge din grup</button>
+                    </form>
+                }
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No users in this group.</p>
+}
+
+<br />
+<a href="/Groups/Show/@Model.Id" class="btn btn-secondary">Back to Group</a>
+
+<style>
+    .user-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .user-link:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
 </style>

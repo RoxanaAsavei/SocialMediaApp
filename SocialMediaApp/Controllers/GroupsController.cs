@@ -42,6 +42,8 @@ namespace SocialMediaApp.Controllers
                             .ToList();
             var userGroups = db.UserGroups.Where(ug => ug.UserId == userId).Select(ug => ug.GroupId).ToList();
             var moderatedGroups = db.GroupModerators.Where(gm => gm.UserId == userId).Select(gm => gm.GroupId).ToList();
+            var joinRequests = db.Joins.Where(j => j.UserId == userId && j.Accepted == false).ToList();
+            ViewBag.JoinRequests = joinRequests;
             ViewBag.Groups = grupuri;
             ViewBag.UserGroups = userGroups;
             ViewBag.ModeratedGroups = moderatedGroups;
@@ -55,18 +57,63 @@ namespace SocialMediaApp.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            var existingMembership = db.UserGroups.FirstOrDefault(ug => ug.UserId == userId && ug.GroupId == id);
-            if (existingMembership == null)
+            var existingRequest = db.Joins.FirstOrDefault(j => j.UserId == userId && j.GroupId == id);
+            if (existingRequest == null)
             {
-                var userGroup = new UserGroup
+                var joinRequest = new Join
                 {
                     UserId = userId,
-                    GroupId = id
+                    GroupId = id,
+                    Accepted = false
+                };
+                db.Joins.Add(joinRequest);
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        public async Task<IActionResult> JoinRequests(int groupId)
+        {
+            var joinRequests = await db.Joins
+                .Include(j => j.User)
+                .Where(j => j.GroupId == groupId && j.Accepted == false)
+                .ToListAsync();
+
+            ViewBag.GroupId = groupId;
+            return View(joinRequests);
+        }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> AcceptJoinRequest(int joinId)
+        {
+            var joinRequest = await db.Joins.FindAsync(joinId);
+            if (joinRequest != null)
+            {
+                joinRequest.Accepted = true;
+                var userGroup = new UserGroup
+                {
+                    UserId = joinRequest.UserId,
+                    GroupId = joinRequest.GroupId ?? 0
                 };
                 db.UserGroups.Add(userGroup);
                 await db.SaveChangesAsync();
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("JoinRequests", new { groupId = joinRequest.GroupId });
+        }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeclineJoinRequest(int joinId)
+        {
+            var joinRequest = await db.Joins.FindAsync(joinId);
+            if (joinRequest != null)
+            {
+                db.Joins.Remove(joinRequest);
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("JoinRequests", new { groupId = joinRequest.GroupId });
         }
 
         [Authorize(Roles = "User,Moderator,Admin")]
@@ -77,33 +124,73 @@ namespace SocialMediaApp.Controllers
             var isModerator = await db.GroupModerators.AnyAsync(gm => gm.UserId == userId && gm.GroupId == id);
             if (isModerator)
             {
-                TempData["ErrorMessage"] = "Moderatorii nu pot sa paraseasca grupul";
+                TempData["ErrorMessage"] = "Moderators cannot leave the group.";
                 return RedirectToAction("Index");
             }
+
             var existingMembership = db.UserGroups.FirstOrDefault(ug => ug.UserId == userId && ug.GroupId == id);
             if (existingMembership != null)
             {
                 db.UserGroups.Remove(existingMembership);
-                await db.SaveChangesAsync();
             }
+
+            var existingJoinRequest = db.Joins.FirstOrDefault(j => j.UserId == userId && j.GroupId == id);
+            if (existingJoinRequest != null)
+            {
+                db.Joins.Remove(existingJoinRequest);
+            }
+
+            await db.SaveChangesAsync();
             return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> RemoveUser(int groupId, string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            var isModerator = await db.GroupModerators.AnyAsync(gm => gm.UserId == currentUserId && gm.GroupId == groupId);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (!isModerator && !isAdmin)
+            {
+                return Forbid();
+            }
+
+            var userGroup = await db.UserGroups.FirstOrDefaultAsync(ug => ug.UserId == userId && ug.GroupId == groupId);
+            if (userGroup != null)
+            {
+                db.UserGroups.Remove(userGroup);
+            }
+
+            var joinRequest = await db.Joins.FirstOrDefaultAsync(j => j.UserId == userId && j.GroupId == groupId);
+            if (joinRequest != null)
+            {
+                db.Joins.Remove(joinRequest);
+            }
+
+            await db.SaveChangesAsync();
+
+            return RedirectToAction("UsersInGroup", new { id = groupId });
         }
 
         [Authorize(Roles = "User,Moderator,Admin")]
         public async Task<IActionResult> UsersInGroup(int id)
         {
+            var userId = _userManager.GetUserId(User);
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
             var group = await db.Groups
-                .Include(g => g.UserGroups)
-                .ThenInclude(ug => ug.User)
-                .FirstOrDefaultAsync(g => g.Id == id);
-
-            if (group == null)
-            {
-                return NotFound();
-            }
-
+                                .Include(g => g.UserGroups)
+                                .ThenInclude(ug => ug.User)
+                                .FirstOrDefaultAsync(g => g.Id == id);
+            var moderatedGroups = db.GroupModerators.Where(gm => gm.UserId == userId).Select(gm => gm.GroupId).ToList();
+            ViewBag.UserId = userId;
+            ViewBag.ModeratedGroups = moderatedGroups;
+            ViewBag.UserRoles = userRoles;
             return View(group);
         }
+
 
 
         [HttpGet]
@@ -193,12 +280,19 @@ namespace SocialMediaApp.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var group = db.Groups.Find(id);
+            var group = db.Groups.Include(g => g.Moderators).FirstOrDefault(g => g.Id == id);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
             if (!(User.IsInRole("Moderator") || User.IsInRole("Admin")))
             {
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
                 return RedirectToAction("Index");
             }
+
+            db.GroupModerators.RemoveRange(group.Moderators);
             db.Groups.Remove(group);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -227,7 +321,7 @@ namespace SocialMediaApp.Controllers
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
                 return RedirectToAction("Index");
             }
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 group.Nume = requestGroup.Nume;
                 group.Descriere = requestGroup.Descriere;
@@ -263,99 +357,22 @@ namespace SocialMediaApp.Controllers
                 return View(requestGroup);
             }
         }
-
-        [HttpGet] // adaugarea postarii cu get -> formular
-        public IActionResult AddPostToGroup()
+        [NonAction]
+        public IEnumerable<SelectListItem> GetAllTags()
         {
-            Post post = new Post();
-            return View(post);
+            var selectList = new List<SelectListItem>();
+            var tags = from tag in db.Tags
+                       select tag;
+            // iteram prin taguri
+            foreach (var tag in tags)
+            {
+                selectList.Add(new SelectListItem
+                {
+                    Value = tag.Id.ToString(),
+                    Text = tag.Denumire
+                });
+            }
+            return selectList;
         }
-
-        [HttpPost] // adaugarea postarii cu post -> salvare in baza de date
-        public async Task<IActionResult> NewPost(Post post, IFormFile? Image, int id)
-        {
-
-			if (User.Identity == null || !User.Identity.IsAuthenticated)
-			{
-				ModelState.AddModelError("UserId", "User must be logged in to create a post.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-			var sanitizer = new HtmlSanitizer();
-			post.Data = DateTime.Now;
-			post.NrComments = 0;
-			post.UserId = _userManager.GetUserId(User);
-            post.GroupId = id;
-
-			if (string.IsNullOrEmpty(post.UserId))
-			{
-				ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (post.TagId == null)
-			{
-				ModelState.AddModelError("TagId", "Tag is required.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (Image != null && Image.Length > 0)
-			{
-				// Verificăm extensia
-				var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
-				var fileExtension = Path.GetExtension(Image.FileName).ToLower();
-				if (!allowedExtensions.Contains(fileExtension))
-				{
-					ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
-					post.Tags = GetAllTags();
-					return View(post);
-				}
-
-				// Cale stocare
-				var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
-				var databaseFileName = "/images/" + Image.FileName;
-
-				// Salvare fișier
-				using (var fileStream = new FileStream(storagePath, FileMode.Create))
-				{
-					await Image.CopyToAsync(fileStream);
-				}
-				ModelState.Remove(nameof(post.Image));
-				post.Image = databaseFileName;
-			}
-			if (TryValidateModel(post))
-			{
-				post.Continut = sanitizer.Sanitize(post.Continut);
-				// Adăugare postare
-				db.Posts.Add(post);
-				await db.SaveChangesAsync();
-				return RedirectToAction("Index", "Posts");
-			}
-			post.Tags = GetAllTags();
-			return View(post);
-		}
-
-
-		[NonAction]
-		public IEnumerable<SelectListItem> GetAllTags()
-		{
-			var selectList = new List<SelectListItem>();
-			var tags = from tag in db.Tags
-					   select tag;
-			// iteram prin taguri
-			foreach (var tag in tags)
-			{
-				selectList.Add(new SelectListItem
-				{
-					Value = tag.Id.ToString(),
-					Text = tag.Denumire
-				});
-			}
-
-			return selectList;
-		}
-
-	}
+    }
 }
