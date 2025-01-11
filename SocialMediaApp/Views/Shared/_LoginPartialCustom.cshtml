@@ -7,6 +7,7 @@
 	@if(signInManager.IsSignedIn(User))
 	{
 		var userId = userManager.GetUserId(User);
+		var user = await userManager.FindByIdAsync(userId);
 		<li class="nav-item">
 			<a class="nav-link text-dark bi bi-search" asp-area="" asp-controller="Users" asp-action="Search">
 				Caută
@@ -18,10 +19,12 @@
 			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">Profilul meu</a>
+			<a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Details" asp-route-id="@userId">
+				<img src="@user.Image" class="rounded-circle" style="width: 30px; height: 30px;"/>
+			</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Deconectează-te</a>
+			<a class="nav-link text-dark" asp-controller="Account" asp-action="Logout"><i class="bi bi-box-arrow-right"></i></a>
 		</li>
 	}
 

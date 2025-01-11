@@ -58,13 +58,19 @@ namespace SocialMediaApp.Controllers
 		[HttpGet]
 		public IActionResult Index(string? id)
 		{
+			var user = db.ApplicationUsers.Where(u => u.Id == id).FirstOrDefault();
+			ViewBag.Privacy = user.Privacy;
 			// afisam cererile de follow unde followedId = id
 			ViewBag.CountToBeAccepted = db.Follows.Where(f => f.FollowedId == id && f.Accepted == false).Count();
 			ViewBag.ToBeAccepted = db.Follows.Include(f => f.Follower)
-											 .Where(f => f.FollowedId == id && f.Accepted == false).ToList();
+											 .Where(f => f.FollowedId == id && f.Accepted == false)
+											 .OrderByDescending(f => f.Date)
+											 .ToList();
 			ViewBag.CountAccepted = db.Follows.Where(f => f.FollowedId == id && f.Accepted == true).Count();
 			ViewBag.Accepted = db.Follows.Include(f => f.Follower)
-										 .Where(f => f.FollowedId == id && f.Accepted == true).ToList();
+										 .Where(f => f.FollowedId == id && f.Accepted == true)
+										 .OrderByDescending(f => f.Date)
+										 .ToList();
 			return View();
 		}
 

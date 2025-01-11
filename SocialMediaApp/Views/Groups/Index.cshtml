@@ -15,8 +15,6 @@
             <div class="card mb-4">
                 <partial name="GroupInfo" model="group" />
                 <div class="card-body">
-                    <h5 class="card-title">@group.Nume</h5>
-                    <p class="card-text">@group.Descriere</p>
                     <a href="/Groups/Show/@group.Id" class="btn btn-primary">Vezi mai mult</a>
                     @if (isModeratorOrAdmin)
                     {

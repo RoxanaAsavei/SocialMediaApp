@@ -1,12 +1,17 @@
-﻿<div class="card mx-auto mb-4" style="width: 100%;">
+﻿@model SocialMediaApp.Models.Group
+
+<div class="card mx-auto mb-4" style="width: 100%;">
     <div class="card-header">
         <i class="bi bi-people-fill"></i> @Model.Nume
     </div>
     @if (@Model.Fotografie != null)
     {
         <div class="d-flex justify-content-center">
-            <img src=@Model.Fotografie class="card-img-top post-image" alt="imagine atasata">
+            <img src=@Model.Fotografie class="card-img-top post-image" alt="imagine atasata"/>
         </div>
 
     }
+    <div class="card-body">
+        @Model.Descriere
+    </div>
 </div>

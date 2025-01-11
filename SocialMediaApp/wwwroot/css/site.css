@@ -78,7 +78,8 @@ body {
 .post-image {
     width: 250px;
     height: 200px;
-    padding-top: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .no-underline {
