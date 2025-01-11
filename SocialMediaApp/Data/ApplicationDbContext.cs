@@ -73,40 +73,23 @@ namespace SocialMediaApp.Data
 				.HasForeignKey(ug => ug.GroupId);
 
 
-			// Configure cascade delete for Comment and Post
+			// cand sterg o postare, vreau sa se stearga si toate comentariile
+            // de la postarea respectiva
 			modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Post)
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure cascade delete for Tag and Post
+            // cand sterg tagul, nu vreau sa se stearga si postarea
+            // pot sa am si postari fara tag
+            // TagId devine nușș
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.Tag)
                 .WithMany(t => t.Posts)
                 .HasForeignKey(p => p.TagId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
 
-            // Configure foreign key for Post and User with NO ACTION
-            modelBuilder.Entity<Post>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // Configure foreign key for Tag and User with NO ACTION
-            modelBuilder.Entity<Tag>()
-                .HasOne(t => t.User)
-                .WithMany(u => u.Tags)
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // Configure foreign key for Comment and User with NO ACTION
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.Group)

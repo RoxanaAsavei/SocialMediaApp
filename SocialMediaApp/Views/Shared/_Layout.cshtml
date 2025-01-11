@@ -23,23 +23,28 @@
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Posts" asp-action="Index">Kalopsia</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                @if (SignInManager.IsSignedIn(User))
-                {
-                   
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index">Postari</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Etichete</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index">Postări</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Groups" asp-action="Index">Grupuri</a>
                             </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Tags" asp-action="Index">Etichete</a>
+                                </li>
+                            }
+
                         </ul>
                        
                     

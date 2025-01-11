@@ -8,11 +8,14 @@ using SocialMediaApp.Models;
 
 namespace SocialMediaApp.Controllers
 {
+	[Authorize(Roles = "Admin")]
 	public class TagsController : Controller
 	{
+		
 		private readonly ApplicationDbContext db;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
+
 		public TagsController(
 		ApplicationDbContext context,
 		UserManager<ApplicationUser> userManager,
@@ -23,17 +26,12 @@ namespace SocialMediaApp.Controllers
 			_userManager = userManager;
 			_roleManager = roleManager;
 		}
-        [Authorize(Roles = "User,Moderator,Admin")]
-        public IActionResult Index()
+		public IActionResult Index()
 		{
-			if (TempData.ContainsKey("message"))
-			{
-				ViewBag.message = TempData["message"].ToString();
-			}
-/*			var tags = from tag in db.Tags
-					   orderby tag.Denumire
-					   select tag;*/
-            var tags = db.Tags.Include(t => t.Posts).ToList();
+            var tags = db.Tags
+							  .Include(t => t.Posts)
+							  .Include(t => t.User)
+							  .ToList();
 
             // Calculate the number of posts for each tag
             foreach (var tag in tags)
@@ -43,32 +41,39 @@ namespace SocialMediaApp.Controllers
             ViewBag.Tags = tags;
 			return View();
 		}
-        [Authorize(Roles = "User,Moderator,Admin")]
-        public ActionResult Show(int id)
+		public ActionResult Show(int id)
 		{
-			/*Tag tag = db.Tags.Find(id);*/
-			var tag = db.Tags.Include(t => t.Posts).ThenInclude(p => p.User).FirstOrDefault(t => t.Id == id);
+			var tag = db.Tags.Find(id);
 			if (tag == null)
 			{
 				return NotFound();
 			}
-            ViewBag.Tag = tag;
-            ViewBag.Posts = tag.Posts;
-            return View(tag);
+			var posts = db.Posts
+								.Include(p => p.Tag)
+								.Include(p => p.Comments)
+								.Include(p => p.User)
+								.Where(p => p.TagId == id)
+								.ToList();
+			ViewBag.Posts = posts;
+			ViewBag.NoPosts = posts.Count();
+
+			return View(tag);
 		}
 
-		[Authorize(Roles = "Moderator,Admin")]
+
 		public IActionResult New()
 		{
 			return View();
 		}
-        [Authorize(Roles = "User,Moderator,Admin")]
+
         [HttpPost]
 		public IActionResult New(Tag t)
 		{
-			t.UserId = _userManager.GetUserId(User);
+			
 			try
 			{
+				t.UserId = _userManager.GetUserId(User);
+				t.Data = DateTime.Now;
 				db.Tags.Add(t);
 				db.SaveChanges();
 				TempData["message"] = "Tagul a fost adaugata";
