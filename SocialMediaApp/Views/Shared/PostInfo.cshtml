@@ -78,7 +78,9 @@
                 {
                     <form asp-controller="Likes" asp-action="Click" asp-route-id="@Model.Id" method="post">
                         <div>
-                            <button class="btn btn-primary bi bi-heart fs-5" type="submit" id="@Model.Id"> @Model.NrLikes</button>
+                            <button class="btn btn-primary bi bi-heart fs-5 like" type="submit" id="@Model.Id"> @Model.NrLikes</button>
+                            <input type="hidden" name="url" value="@($"{Context.Request.Path}{Context.Request.QueryString}")"/>
+
                         </div>
                     </form>
 

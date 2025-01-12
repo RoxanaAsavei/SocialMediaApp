@@ -1,56 +1,21 @@
 ﻿﻿@{
-    ViewBag.Title = "Afisarea grupurilor";
+    ViewData["Title"] = "Grupuri";
     var userId = ViewBag.UserId;
 }
 
-<h2>@ViewBag.Title</h2>
+<h2 class="text-center">Grupuri</h2>
 <br />
 
+<a href="/Groups/New" class="btn btn-success"><i class="bi bi-plus-lg"></i> Grup nou</a>
+
+<br />
+<br />
 <div class="row">
     @foreach (SocialMediaApp.Models.Group group in ViewBag.Groups)
     {
-        var isMember = ViewBag.UserGroups.Contains(group.Id) || ViewBag.ModeratedGroups.Contains(group.Id);
-        var isModeratorOrAdmin = ViewBag.ModeratedGroups.Contains(group.Id) || ViewBag.UserRoles.Contains("Admin");
-        <div class="col-md-4">
-            <div class="card mb-4">
+        <div class="col-md-4 groupInfo" data-group-id="@group.Id">
                 <partial name="GroupInfo" model="group" />
-                <div class="card-body">
-                    <a href="/Groups/Show/@group.Id" class="btn btn-primary">Vezi mai mult</a>
-                    @if (isModeratorOrAdmin)
-                    {
-                        <a href="/Groups/Edit/@group.Id" class="btn btn-secondary">Editare grup</a>
-                    }
-                    @if (isMember)
-                    {
-                        @if (!ViewBag.ModeratedGroups.Contains(group.Id))
-                        {
-                            <form action="/Groups/Leave/@group.Id" method="post" class="d-inline-block">
-                                <button class="btn btn-danger" type="submit"><i class="bi bi-x-circle"></i> Leave</button>
-                            </form>
-                        }
-                    }
-                    else
-                    {
-                        var joinRequests = (IEnumerable<Join>)ViewBag.JoinRequests;
-                        var joinRequestPending = joinRequests.Any(j => j.GroupId == group.Id && j.UserId == userId && j.Accepted == false);
-                        if (!joinRequestPending)
-                        {
-                            <form action="/Groups/Join/@group.Id" method="post" class="d-inline-block">
-                                <button class="btn btn-outline-primary" type="submit">JOIN</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <button class="btn btn-outline-secondary" disabled>Join Request Pending</button>
-                        }
-                    }
-                </div>
-            </div>
         </div>
     }
 </div>
 
-<br />
-<br />
-
-<a href="/Groups/New" class="btn btn-success">Grup nou</a>

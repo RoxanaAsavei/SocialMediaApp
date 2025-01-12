@@ -1,6 +1,7 @@
 ﻿using Ganss.Xss;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -37,8 +38,8 @@ namespace SocialMediaApp.Controllers
         }
         public IActionResult Index()
         {
-            // daca nu e signed in, luam postarile persoanelor care au cont public
-            var postari = db.Posts.Include("Comments")
+			// daca nu e signed in, luam postarile persoanelor care au cont public
+			var postari = db.Posts.Include("Comments")
                         .Include("Tag")
                         .Include("User")
                         .Where(p => p.User.Privacy == false && p.GroupId == null) // Exclude posts with a non-null GroupId
