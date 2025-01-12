@@ -13,9 +13,10 @@ namespace SocialMediaApp.Models
 		[MaxLength(500, ErrorMessage = "Descrierea nu poate avea mai mult de 500 de caractere")]
 		public string Descriere { get; set; }
 		public string? Fotografie { get; set; }
+		public string? ModeratorId { get; set; }
 		// de vazut ce facem cu moderatorul care creeaza grupul
 		virtual public ICollection<UserGroup>? UserGroups { get; set; }
 		virtual public ICollection<Post>? Posts { get; set; }
-        public virtual ICollection<GroupModerator>? Moderators { get; set; }
-    }
+		virtual public ApplicationUser? Moderator { get; set; }
+	}
 }

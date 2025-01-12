@@ -14,6 +14,7 @@ namespace SocialMediaApp.Models
 		public virtual ICollection<Follow>? Followers { get; set; }
 		public virtual ICollection<Follow>? Following { get; set; }
 		public virtual ICollection<Like>? Likes { get; set; }
+		public virtual ICollection<Group>? ModeratedGroups { get; set; }
 
 		[Required(ErrorMessage = "Adaugă o scurtă descriere.")]
 		[StringLength(100, ErrorMessage = "Descrierea trebuie să aibă cel puțin {2} caractere.", MinimumLength = 5)]
@@ -34,6 +35,5 @@ namespace SocialMediaApp.Models
 		// tinem minte rolurile 
 		[NotMapped]
 		public IEnumerable<SelectListItem>? AllRoles { get; set; }
-        public virtual ICollection<GroupModerator>? ModeratedGroups { get; set; }
     }
 }

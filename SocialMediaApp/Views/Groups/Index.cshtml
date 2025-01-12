@@ -1,4 +1,6 @@
-﻿﻿@{
+﻿@model SocialMediaApp.Models.Group
+
+@{
     ViewData["Title"] = "Grupuri";
     var userId = ViewBag.UserId;
 }
@@ -10,12 +12,18 @@
 
 <br />
 <br />
-<div class="row">
-    @foreach (SocialMediaApp.Models.Group group in ViewBag.Groups)
-    {
-        <div class="col-md-4 groupInfo" data-group-id="@group.Id">
+
+@if(ViewBag.Groups != null)
+{
+    <div class="row">
+        @foreach (var group in ViewBag.Groups)
+        {
+            <div class="col-md-4 groupInfo" data-group-id="@group.Id">
                 <partial name="GroupInfo" model="group" />
-        </div>
-    }
-</div>
+            </div>
+        }
+    </div>
+
+}
+
 

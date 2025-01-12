@@ -1,34 +1,42 @@
 ﻿@model IEnumerable<SocialMediaApp.Models.Join>
 
 @{
-    ViewBag.Title = "Join Requests";
+    ViewBag.Title = "Cereri";
 }
 
-<h2>Join Requests for Group @ViewBag.GroupId</h2>
+<div class="text-center fs-3 fw-bold"> Cereri pentru @ViewBag.GroupName</div>
 
 <table class="table">
     <thead>
         <tr>
-            <th>User</th>
-            <th>Actions</th>
+            <th>Utilizator</th>
+            <th>Acțiune</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var request in Model)
         {
             <tr>
-                <td>@request.User.UserName</td>
+                <td>
+                    <img src="@request.User.Image" class="rounded-circle" style="width: 30px; height: 30px;" />
+                    <a href="/Users/Details/@request.User.Id" class="no-underline">
+                    @request.User.FirstName @request.User.LastName
+                    </a>
+                </td>
                 <td>
                     <form asp-action="AcceptJoinRequest" method="post">
                         <input type="hidden" name="joinId" value="@request.Id" />
-                        <button type="submit" class="btn btn-success">Accept</button>
+                        <button type="submit" class="btn btn-success bi bi-check-lg"> Acceptă</button>
                     </form>
+                    <br />
                     <form asp-action="DeclineJoinRequest" method="post">
                         <input type="hidden" name="joinId" value="@request.Id" />
-                        <button type="submit" class="btn btn-danger">Decline</button>
+                        <button type="submit" class="btn btn-danger bi bi-trash3"> Șterge</button>
                     </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a href="/Groups/Show/@ViewBag.GroupId" class="btn btn-primary no-underline bi bi-arrow-left"> Înapoi</a>

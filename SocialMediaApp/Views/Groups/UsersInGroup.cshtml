@@ -43,8 +43,7 @@ else
     var isModeratorOrAdmin = ViewBag.ModeratedGroups.Contains(Model.Id) || ViewBag.UserRoles.Contains("Admin");
 }
 
-<h1>Utilizatorii din grupul @Model.Nume</h1>
-<br />
+<div class="fs-3 fw-bold text-center">Membrii din @Model.Nume</div>
 <hr />
 <br />
 
@@ -53,16 +52,20 @@ else
     <ul class="list-group">
         @foreach (var userGroup in Model.UserGroups)
         {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <a href="/Users/Details/@userGroup.UserId" class="user-link">
-                    <strong>@userGroup.User.UserName</strong> (@userGroup.User.Email)
-                </a>
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+                <div>
+                    <img src="@userGroup.User.Image" class="rounded-circle" style="width: 30px; height: 30px;" />
+                    <a href="/Users/Details/@userGroup.User.Id" class="no-underline">
+                        @userGroup.User.FirstName @userGroup.User.LastName
+                    </a>
+                </div>
+                    
                 @if (isModeratorOrAdmin && userGroup.UserId != userId)
                 {
                     <form action="/Groups/RemoveUser" method="post" class="d-inline-block">
                         <input type="hidden" name="groupId" value="@Model.Id" />
                         <input type="hidden" name="userId" value="@userGroup.UserId" />
-                        <button class="btn btn-danger" type="submit">Sterge din grup</button>
+                        <button class="btn btn-danger bi bi-trash3" type="submit"> Elimină din grup</button>
                     </form>
                 }
             </li>
@@ -75,7 +78,7 @@ else
 }
 
 <br />
-<a href="/Groups/Show/@Model.Id" class="btn btn-secondary">Back to Group</a>
+<a href="/Groups/Show/@Model.Id" class="btn btn-secondary bi bi-arrow-left"> Înapoi</a>
 
 <style>
     .user-link {
