@@ -82,7 +82,7 @@ namespace SocialMediaApp.Data
 
             // cand sterg tagul, nu vreau sa se stearga si postarea
             // pot sa am si postari fara tag
-            // TagId devine nușș
+            // TagId devine null
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.Tag)
                 .WithMany(t => t.Posts)

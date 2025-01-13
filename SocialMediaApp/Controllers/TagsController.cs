@@ -8,7 +8,7 @@ using SocialMediaApp.Models;
 
 namespace SocialMediaApp.Controllers
 {
-	[Authorize(Roles = "Admin")]
+	
 	public class TagsController : Controller
 	{
 		
@@ -26,6 +26,8 @@ namespace SocialMediaApp.Controllers
 			_userManager = userManager;
 			_roleManager = roleManager;
 		}
+
+		[Authorize(Roles = "Admin")]
 		public IActionResult Index()
 		{
             var tags = db.Tags
@@ -41,6 +43,8 @@ namespace SocialMediaApp.Controllers
             ViewBag.Tags = tags;
 			return View();
 		}
+
+		[Authorize(Roles = "Admin, User")]
 		public ActionResult Show(int id)
 		{
 			var tag = db.Tags.Find(id);
@@ -48,25 +52,38 @@ namespace SocialMediaApp.Controllers
 			{
 				return NotFound();
 			}
+
+			// luam postarile persoanelor cu cont public
 			var posts = db.Posts
-								.Include(p => p.Tag)
-								.Include(p => p.Comments)
-								.Include(p => p.User)
-								.Where(p => p.TagId == id)
-								.ToList();
+				.Include(p => p.Tag)
+				.Include(p => p.Comments)
+				.Include(p => p.User)
+				.Where(p => p.TagId == id && p.User.Privacy == false)
+				.ToList();
+
+			if (User.IsInRole("Admin")) // adminul vede toate postarile cu eticheta res
+			{
+				 posts = db.Posts
+					.Include(p => p.Tag)
+					.Include(p => p.Comments)
+					.Include(p => p.User)
+					.Where(p => p.TagId == id)
+					.ToList();
+			}	
 			ViewBag.Posts = posts;
 			ViewBag.NoPosts = posts.Count();
 
 			return View(tag);
 		}
 
-
+		[Authorize(Roles = "Admin")]
 		public IActionResult New()
 		{
 			return View();
 		}
 
-        [HttpPost]
+		[Authorize(Roles = "Admin")]
+		[HttpPost]
 		public IActionResult New(Tag t)
 		{
 			
@@ -84,6 +101,8 @@ namespace SocialMediaApp.Controllers
 				return View(t);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
 		public IActionResult Edit(int id)
 		{
 			Tag tag = db.Tags.Find(id);
@@ -98,6 +117,8 @@ namespace SocialMediaApp.Controllers
                 return RedirectToAction("Index");
             }
 		}
+
+		[Authorize(Roles = "Admin")]
 		[HttpPost]
 		public ActionResult Edit(int id, Tag requestTag)
 		{
@@ -119,6 +140,8 @@ namespace SocialMediaApp.Controllers
 				return View(requestTag);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
 		public ActionResult Delete(int id)
 		{
 			Tag tag = db.Tags.Find(id);

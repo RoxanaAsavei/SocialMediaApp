@@ -14,7 +14,7 @@
 {
     <div>
         <div class="d-flex flex-row justify-content-between">
-            <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="Model.Id">
+            <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
                 <button class="btn btn-outline-danger bi bi-trash" type="submit"> Șterge</button>
             </form>
 
@@ -22,7 +22,7 @@
                 <button class="btn btn-outline-success bi bi-pencil-square"> Moderează</button>
             </form>
 
-            <form method="get" asp-controller="Groups" asp-action="Edit" asp-route-id="Model.Id">
+            <form method="get" asp-controller="Groups" asp-action="Edit" asp-route-id="@Model.Id">
                 <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editează</button>
             </form>
         </div>
@@ -39,6 +39,12 @@
     <div class="d-flex flex-row justify-content-center" style="gap: 5rem;">
         <a class="btn btn-primary bi bi-plus-lg" href="/Posts/New?groupId=@Model.Id"> Postează</a>
         <a class="btn btn-success bi bi-people" href="/Groups/UsersinGroup/@Model.Id"> Membri</a>
+        @if(!ViewBag.CanDeleteGroup) 
+        {
+            <form action="/Groups/Leave/@Model.Id" method="post">
+                <button class="btn btn-outline-danger bi bi-box-arrow-left" type="submit"> Ieși din grup</button>
+            </form>
+        }
     </div>
     <br />
 
@@ -62,9 +68,9 @@
                                 <button type="submit" class="btn btn-info">Editează</button>
                             </form>
                         }
-                     </div>
+                    </div>
                 </div>
-            
+
             </div>
         }
     }
@@ -80,7 +86,14 @@ else
     <div class="d-flex justify-content-center">
         @if (ViewBag.JoinRequest)
         {
-            <button class="btn btn-outline-secondary bi bi-send" disabled>Cererea a fost trimisă</button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary bi bi-send" disabled> Cererea a fost trimisă</button>
+                <form action="/Groups/Leave/@Model.Id" method="post">
+                    <button class="btn btn-outline-danger bi bi-trash3" type="submit"> Anulează</button>
+                </form>
+
+            </div>
+
         }
 
         else

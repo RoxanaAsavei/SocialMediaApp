@@ -1,0 +1,61 @@
+[33m02e97de[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mroxana[m[33m, [m[1;31morigin/roxana[m[33m)[m incercare embedded in summernote (esuata)
+[33mad081c9[m restructurare groups
+[33m40e4c8c[m like reload
+[33mc646893[m stilizare
+[33m55cd2e0[m update tags
+[33m720c5d1[m Merge branch 'roxana' of https://github.com/RoxanaAsavei/SocialMediaApp into roxana
+[33m642bf18[m group picture
+[33mc3d185e[m Merge pull request #5 from RoxanaAsavei/master
+[33me68d577[m[33m ([m[1;31morigin/master[m[33m)[m postari in grup
+[33m9c6ee47[m join modificat + stergere moderatori
+[33m165f478[m poza in grup functionala
+[33mb79bfde[m Merge pull request #4 from RoxanaAsavei/roxana
+[33me31cde2[m unregistered user & some admin rights
+[33m3ea59c4[m Merge pull request #3 from RoxanaAsavei/master
+[33ma0f4514[m Merge pull request #2 from RoxanaAsavei/roxana
+[33m19952bc[m Merge branch 'master' into roxana
+[33mdd28fe0[m add video setup
+[33maab626e[m grupuri partial
+[33m030926e[m like feature (just count)
+[33m8ac3575[m like feature setup
+[33m20e6002[m view followers / following
+[33maebcaf0[m[33m ([m[1;32mProfileBranch[m[33m)[m solved bug create group
+[33m22a3603[m[33m ([m[1;32mmaster[m[33m)[m change password
+[33m15855d5[m user validation
+[33m3aca840[m add custom home page
+[33m9a7cb71[m custom register & login
+[33mc555800[m search users
+[33m0e07260[m follow part1
+[33m678a41d[m responsive posts
+[33m614da1a[m add profile to navbar
+[33mdcb831a[m final touches to view & edit done
+[33m0aa3f3e[m view profile
+[33mdbaebaf[m view profile
+[33m30dd7ac[m se lucreaza la grupuri
+[33ma8009e8[m Merge branch 'master' of https://github.com/RoxanaAsavei/SocialMediaApp
+[33m4243bfc[m Authorize
+[33md3ddc63[m Many to many user & group
+[33meda6785[m Solve post edit + add no comms
+[33m1961b61[m Postari fara imagine
+[33m0b2485d[m putina stilizare
+[33mf2e8cbb[m Merge branch 'master' of https://github.com/RoxanaAsavei/SocialMediaApp into ProfileBranch
+[33m69a39df[m declare functions
+[33m1978175[m Bucurie maxima n tribune!!!!
+[33ma7320d6[m am sters tot
+[33m4b76b79[m Poze ok si la edit de grup, adaug. postare in grup nu merge
+[33mda605ca[m Merge branch 'master' of https://github.com/RoxanaAsavei/SocialMediaApp into ProfileBranch
+[33md8381a5[m in lucru
+[33m96e5ba7[m si group
+[33m0022caf[m mai multe validari
+[33m0e727c3[m Roxana a rezolvat stergerea tag urilor
+[33mf1948a3[m stergere tag (tag utilizat)
+[33m8c304c8[m delete tag
+[33meeff936[m de rezolvat posts/show
+[33m863985e[m CRUD postari
+[33mf4cb140[m CRUD Tags si Posts
+[33mf0ec4bb[m Configurare manager user roluri
+[33mc31f931[m Adaugare roluri
+[33m210e757[m Adaugare data
+[33mc3728aa[m Crearea bazei de date
+[33m1f0aad9[m Add project files.
+[33m9497973[m Add .gitattributes and .gitignore.

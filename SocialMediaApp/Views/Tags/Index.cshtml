@@ -58,6 +58,13 @@
                             <a asp-controller="Tags" asp-action="Show" asp-route-id="@tag.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Vezi postări</a>
                         </div>
 
+                        @if(@tag.PostCount == 0) 
+                        {
+                            <div>
+                                <a asp-controller="Tags" asp-action="Edit" asp-route-id="@tag.Id" class="btn btn-sm btn-outline-success"><i class="bi bi-pencil-square"></i> Editează</a>
+                            </div>
+                        }
+
                     </div>
                 </div>
             </div>

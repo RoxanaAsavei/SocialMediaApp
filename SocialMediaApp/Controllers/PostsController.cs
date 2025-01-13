@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 
 namespace SocialMediaApp.Controllers
 {
+	[Authorize(Roles = "User,Admin")]
 	public class PostsController : Controller
 	{
         private readonly ApplicationDbContext db;
@@ -22,7 +23,8 @@ namespace SocialMediaApp.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
-        public PostsController(
+	
+		public PostsController(
         ApplicationDbContext context,
 		IWebHostEnvironment env,
 		UserManager<ApplicationUser> userManager,
@@ -55,7 +57,7 @@ namespace SocialMediaApp.Controllers
                     postari = db.Posts.Include("Comments")
                         .Include("Tag")
                         .Include("User")
-                        .Where(p => p.GroupId == null) // Exclude posts with a non-null GroupId
+                        .Where(p => p.GroupId == null)
                         .OrderByDescending(a => a.Data);
                 }
                 else
@@ -139,7 +141,6 @@ namespace SocialMediaApp.Controllers
 
 
         // adaugarea unui comentariu din formular
-        [Authorize(Roles = "User,Moderator,Admin")]
         [HttpPost]
 		public IActionResult Show([FromForm] Comment comment)
 		{
@@ -306,13 +307,6 @@ namespace SocialMediaApp.Controllers
 			if (string.IsNullOrEmpty(post.UserId))
 			{
 				ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (post.TagId == null)
-			{
-				ModelState.AddModelError("TagId", "Tag is required.");
 				post.Tags = GetAllTags();
 				return View(post);
 			}

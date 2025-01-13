@@ -8,13 +8,16 @@
 <div class="fs-3 fw-bold text-center">Postări cu eticheta @Model.Denumire</div>
 <hr />
 
+@if(User.IsInRole("Admin"))
+{
+    <form asp-controller="Tags" asp-action="Index" method="get">
+        <button class="btn btn-success" type="submit">
+            <i class="bi bi-arrow-left"></i>
+            Înapoi
+        </button>
+    </form>
+}
 
-<form asp-controller="Tags" asp-action="Index" method="get">
-    <button class="btn btn-success" type="submit">
-        <i class="bi bi-arrow-left"></i>
-        Înapoi
-    </button>
-</form>
 
 <br />
 @if (ViewBag.NoPosts > 0)
