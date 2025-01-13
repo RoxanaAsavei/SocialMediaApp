@@ -107,15 +107,8 @@ namespace SocialMediaApp.Controllers
 		{
 			Tag tag = db.Tags.Find(id);
 			ViewBag.Tag = tag;
-            if (tag.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
-            {
-                return View(tag);
-            }
-            else
-            {
-                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
-                return RedirectToAction("Index");
-            }
+            return View(tag);
+
 		}
 
 		[Authorize(Roles = "Admin")]
@@ -123,11 +116,6 @@ namespace SocialMediaApp.Controllers
 		public ActionResult Edit(int id, Tag requestTag)
 		{
 			Tag tag = db.Tags.Find(id);
-            if (!(tag.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
-            {
-                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
-                return RedirectToAction("Index");
-            }
             if(ModelState.IsValid)
 			{
 				tag.Denumire = requestTag.Denumire;

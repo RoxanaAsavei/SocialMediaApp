@@ -282,7 +282,7 @@ namespace SocialMediaApp.Controllers
             return View(post);
         }
 
-        [Authorize(Roles = "User,Moderator,Admin")]
+        [Authorize(Roles = "User, Admin")]
         [HttpPost]
 		public async Task<IActionResult> New(Post post, IFormFile? Image)
 		{
