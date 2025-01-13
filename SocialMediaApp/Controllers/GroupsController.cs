@@ -292,7 +292,7 @@ namespace SocialMediaApp.Controllers
         {
             Group grup = db.Groups.Find(id);
             var idUser = _userManager.GetUserId(User);
-            if (grup.ModeratorId ==idUser  || User.IsInRole("Admin"))
+            if (grup.ModeratorId == idUser  || User.IsInRole("Admin"))
             {
                 return View(grup);
             }

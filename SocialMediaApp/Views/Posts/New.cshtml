@@ -1,5 +1,6 @@
 ﻿@model SocialMediaApp.Models.Post
 
+
 <h2 class="text-center mt-5">Adăugare postare</h2>
 
 <br />
@@ -21,9 +22,130 @@
                 <div class="form-group">
                     <label asp-for="Continut" class="form-control">Text postare</label>
                     <br />
-                    <textarea asp-for="Continut" class="form-control summernote"></textarea>
+                    <textarea name="Content" asp-for="Continut" class="form-control" id="summernote"></textarea>
                     <span asp-validation-for="Continut" class="text-danger"></span>
                     <br /><br />
+                    <script>
+                        $(document).ready(function () {
+                        $('#summernote').summernote({
+                        placeholder: 'Creează-ți postarea...',
+                        tabsize: 2,
+                        height: 300,
+                        toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                        ],
+                        callbacks: {
+                        // Callback pentru upload imagini
+                        onImageUpload: function (files) {
+                        const file = files[0];
+                        if (file) {
+                        const formData = new FormData();
+                        formData.append('image', file);
+
+                        fetch('/Posts/UploadImage', {
+                        method: 'POST',
+                        body: formData
+                        })
+                        .then(response => {
+                        if (response.ok) {
+                        return response.json();
+                        } else {
+                        alert('Image upload failed.');
+                        throw new Error('Failed to upload image');
+                        }
+                        })
+                        .then(data => {
+                        $('#summernote').summernote('insertImage', data.imageUrl);
+                        })
+                        .catch(error => {
+                        console.error('Error uploading image:', error);
+                        });
+                        }
+                        },
+
+                        // Callback pentru adăugarea unui buton custom pentru videoclipuri
+                        onInit: function () {
+                        const button = '<button type="button" id="custom-video-btn" class="note-btn btn btn-light" title="Embed Video"><i class="note-icon-video"></i></button>';
+                        $('.note-insert').append(button);
+
+                        $('#custom-video-btn').click(function () {
+                        const videoUrl = prompt('Enter the video URL (YouTube or Vimeo):');
+                        if (videoUrl) {
+                        const embedHtml = getEmbedHtml(videoUrl);
+                        if (embedHtml) {
+                        $('#summernote').summernote('code', embedHtml);
+                        } else {
+                        alert('Invalid video URL. Please provide a valid YouTube or Vimeo link.');
+                        }
+                        }
+                        });
+                        }
+                        }
+                        });
+
+                        $('#summernote').on('summernote.change', function () {
+                        $('textarea[name="Content"]').val($('#summernote').summernote('code'));
+                        });
+                        });
+
+                        // Helper function pentru generarea codului embed al videoclipului
+                                                    function getEmbedHtml(url) {
+                            let embedUrl = '';
+                            try {
+                                // Verificare dacă URL-ul începe cu http:// sau https://
+                                if (!/^https?:\/\//.test(url)) {
+                                    throw new Error('URL must start with http:// or https://');
+                                }
+
+                                if (url.includes('youtube.com')) {
+                                    // Extrage parametrul 'v' din URL
+                                    const match = url.match(/[?&]v=([^&#]+)/);
+                                    const youtubeId = match ? match[1] : null;
+                                    if (!youtubeId) throw new Error('Invalid YouTube URL');
+                                    embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+                                } else if (url.includes('youtu.be')) {
+                                    // Extrage ID-ul din URL-ul scurtat
+                                    const youtubeId = url.split('/').pop();
+                                    if (!youtubeId) throw new Error('Invalid YouTube URL');
+                                    embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+                                } else if (url.includes('vimeo.com')) {
+                                    // Extrage ID-ul din URL-ul Vimeo
+                                    const vimeoId = url.split('/').pop();
+                                    if (!vimeoId) throw new Error('Invalid Vimeo URL');
+                                    embedUrl = `https://player.vimeo.com/video/${vimeoId}`;
+                                } else {
+                                    throw new Error('Unsupported video platform. Only YouTube and Vimeo are supported.');
+                                }
+
+                                return `
+                                    <iframe
+                                        src="${embedUrl}"
+                                        width="560"
+                                        height="315"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>`;
+                            } catch (error) {
+                                console.error('Error generating embed code:', error);
+                                alert(error.message);
+                            }
+
+                            return null;
+                        }
+                    </script>
+                    
+
+
+
                 </div>
 
                 <div class="form-group">
@@ -56,4 +178,6 @@
         </div>
     </div>
 </div>
+
+
 

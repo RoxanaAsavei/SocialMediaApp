@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
 using SocialMediaApp.Models;
+using System;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -36,7 +37,51 @@ namespace SocialMediaApp.Controllers
             _roleManager = roleManager;
 			_signInManager = signInManager;
         }
-        public IActionResult Index()
+
+		[HttpPost("UploadImage")]
+		public async Task<IActionResult> UploadImage(IFormFile image)
+		{
+			if (image == null || image.Length == 0)
+			{
+				return BadRequest(new { message = "No file uploaded." });
+			}
+
+			var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
+			var fileExtension = Path.GetExtension(image.FileName).ToLower();
+			if (!allowedExtensions.Contains(fileExtension))
+			{
+				return BadRequest(new { message = "Invalid file type." });
+			}
+
+			try
+			{
+				// Define the upload path
+				string uploadDir = Path.Combine(_env.WebRootPath, "images");
+				if (!Directory.Exists(uploadDir))
+				{
+					Directory.CreateDirectory(uploadDir);
+				}
+
+				// Generate a unique file name
+				string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+				// Save the file to the server
+				string filePath = Path.Combine(uploadDir, fileName);
+				using (var fileStream = new FileStream(filePath, FileMode.Create))
+				{
+					await image.CopyToAsync(fileStream);
+				}
+
+				// Return the image URL
+				string imageUrl = Url.Content($"~/images/{fileName}");
+				return Ok(new { imageUrl });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { message = "An error occurred while uploading the image.", error = ex.Message });
+			}
+		}
+		public IActionResult Index()
         {
 			// daca nu e signed in, luam postarile persoanelor care au cont public
 			var postari = db.Posts.Include("Comments")
