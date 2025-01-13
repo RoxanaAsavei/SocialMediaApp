@@ -19,7 +19,7 @@ namespace SocialMediaApp.Models
 		[Required(ErrorMessage = "Adaugă o scurtă descriere.")]
 		[StringLength(100, ErrorMessage = "Descrierea trebuie să aibă cel puțin {2} caractere.", MinimumLength = 5)]
 		public string Description { get; set; }
-		public string Image { get; set; }
+		public string? Image { get; set; }
 
 		[Required(ErrorMessage = "Prenumele este obligatoriu.")]
 		public string FirstName { get; set; }

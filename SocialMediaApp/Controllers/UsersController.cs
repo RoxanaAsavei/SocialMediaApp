@@ -31,7 +31,7 @@ namespace SocialMediaApp.Controllers
 		}
         // afisam profilele tuturor utilizatorilor
 		// la final trebuie autorizat doar pentru admin -> panoul de admin
-        [Authorize(Roles = "User,Moderator,Admin")]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
 		{
 			var users = from user in db.ApplicationUsers

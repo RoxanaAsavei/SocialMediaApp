@@ -15,8 +15,8 @@ namespace SocialMediaApp.Models
 		public DateTime Data { get; set; }
 		public virtual ICollection<Post>? Posts { get; set; }
         [Required(ErrorMessage = "User-ul este obligatorie")]
-        public string UserId { get; set; }	
-		public virtual ApplicationUser User { get; set; }
+        public string? UserId { get; set; }	
+		public virtual ApplicationUser? User { get; set; }
         [NotMapped]
         public int PostCount { get; set; }
 

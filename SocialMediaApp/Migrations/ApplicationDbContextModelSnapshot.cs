@@ -188,7 +188,6 @@ namespace SocialMediaApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -261,7 +260,6 @@ namespace SocialMediaApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("PostId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -520,8 +518,7 @@ namespace SocialMediaApp.Migrations
                     b.HasOne("SocialMediaApp.Models.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
                         .WithMany("Comments")

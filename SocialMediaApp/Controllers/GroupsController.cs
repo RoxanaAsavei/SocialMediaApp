@@ -30,7 +30,7 @@ namespace SocialMediaApp.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        [Authorize(Roles = "User,Moderator,Admin")]
+        [Authorize(Roles = "User, Admin")]
         public async Task<IActionResult> Index()
         {
             var grupuri = db.Groups.ToList();
@@ -74,7 +74,6 @@ namespace SocialMediaApp.Controllers
             return View(joinRequests);
         }
 
-        [Authorize(Roles = "User, Admin")]
         [HttpPost]
         public async Task<IActionResult> AcceptJoinRequest(int joinId)
         {
@@ -93,7 +92,6 @@ namespace SocialMediaApp.Controllers
             return RedirectToAction("JoinRequests", new { groupId = joinRequest.GroupId });
         }
 
-        [Authorize(Roles = "Moderator,Admin")]
         [HttpPost]
         public async Task<IActionResult> DeclineJoinRequest(int joinId)
         {
@@ -106,7 +104,6 @@ namespace SocialMediaApp.Controllers
             return RedirectToAction("JoinRequests", new { groupId = joinRequest.GroupId });
         }
 
-        [Authorize(Roles = "User,Moderator,Admin")]
         [HttpPost]
         public async Task<IActionResult> Leave(int id)
         {
@@ -134,7 +131,6 @@ namespace SocialMediaApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Moderator,Admin")]
         [HttpPost]
         public async Task<IActionResult> RemoveUser(int groupId, string userId)
         {
@@ -164,7 +160,6 @@ namespace SocialMediaApp.Controllers
             return RedirectToAction("UsersInGroup", new { id = groupId });
         }
 
-        [Authorize(Roles = "User,Moderator,Admin")]
         public async Task<IActionResult> UsersInGroup(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -235,7 +230,6 @@ namespace SocialMediaApp.Controllers
         }
 
 
-        [Authorize(Roles = "User,Moderator,Admin")]
         public IActionResult Show(int id)
         {
             var group = db.Groups
@@ -304,10 +298,11 @@ namespace SocialMediaApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Group requestGroup, IFormFile? Image)
+        public async Task<IActionResult> Edit(int id, Group requestGroup, IFormFile? Fotografie)
         {
             Group group = db.Groups.Find(id);
-            if (!(User.IsInRole("Moderator") || User.IsInRole("Admin")))
+			var idUser = _userManager.GetUserId(User);
+			if (!(group.ModeratorId == idUser || User.IsInRole("Admin")))
             {
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
                 return RedirectToAction("Index");
@@ -316,24 +311,23 @@ namespace SocialMediaApp.Controllers
             {
                 group.Nume = requestGroup.Nume;
                 group.Descriere = requestGroup.Descriere;
-                group.Fotografie = requestGroup.Fotografie;
 
-                if (Image != null && Image.Length > 0)
+                if (Fotografie != null && Fotografie.Length > 0)
                 {
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mov" };
-                    var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+                    var fileExtension = Path.GetExtension(Fotografie.FileName).ToLower();
                     if (!allowedExtensions.Contains(fileExtension))
                     {
                         ModelState.AddModelError("PostImage", "Fișierul trebuie să fie o imagine(jpg, jpeg, png, gif) sau un video(mp4, mov).");
                         return View(requestGroup);
                     }
 
-                    var storagePath = Path.Combine(_env.WebRootPath, "images", Image.FileName);
-                    var databaseFileName = "/images/" + Image.FileName;
+                    var storagePath = Path.Combine(_env.WebRootPath, "images", Fotografie.FileName);
+                    var databaseFileName = "/images/" + Fotografie.FileName;
 
                     using (var fileStream = new FileStream(storagePath, FileMode.Create))
                     {
-                        await Image.CopyToAsync(fileStream);
+                        await Fotografie.CopyToAsync(fileStream);
                     }
                     ModelState.Remove(nameof(group.Fotografie));
                     group.Fotografie = databaseFileName;
