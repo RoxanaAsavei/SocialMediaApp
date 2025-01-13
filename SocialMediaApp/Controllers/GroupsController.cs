@@ -335,7 +335,7 @@ namespace SocialMediaApp.Controllers
 
                 db.SaveChanges();
                 TempData["message"] = "Articolul a fost modificat";
-                return RedirectToAction("Index");
+                return Redirect("/Groups/Show/" + group.Id);
             }
             else
             {
