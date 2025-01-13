@@ -4,7 +4,8 @@
 
 <div class="mx-auto card w-auto h-auto">
     <div class="card-header button-container">
-        <i class="bi bi-person-circle"> 
+        <div class="fw-bold">
+            <img src="@Model.User.Image" class="rounded-circle" style="width: 30px; height: 30px;" />
             @if (signInManager.IsSignedIn(User))
             {
                 <a href="/Users/Details/@Model.User.Id" class="no-underline">
@@ -12,17 +13,19 @@
                 </a>
             }
 
-            else 
+            else
             {
                 <a href="/Home/Index" class="no-underline">
                     @Model.User.FirstName @Model.User.LastName
                 </a>
             }
+        </div>
 
-        </i>
 
-
-        <i class="bi bi-bookmark-fill"> @Model.Tag.Denumire</i>
+        @if(@Model.TagId != null)
+        {
+            <a href="/Tags/Show/@Model.Tag.Id" class="bi bi-bookmark-fill no-underline"> @Model.Tag.Denumire</a>
+        }
     </div>
 
     <div class="d-flex flex-row card-img-top justify-content-center">
@@ -34,16 +37,22 @@
 
         }
 
-        @if(@Model.Video != null)
-        {
-            <div>
-                <iframe width="560" height="315" src="@Model.Video" alt="Videoclipul nu poate fi redat"></iframe>
-            </div>
-        }
+        @* @if(@Model.Video != null) *@
+        @* { *@
+        @*     <div> *@
+        @*         <iframe width="560" height="315" *@
+        @*                 src="https://www.youtube.com/embed/@Model.Video" *@
+        @*                 title="YouTube video player" frameborder="0" *@
+        @*                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" *@
+        @*                 allowfullscreen> *@
+        @*         </iframe> *@
+
+        @*     </div> *@
+        @* } *@
     </div>
 
     <div class="card-body">
-        <p class="card-text" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+        <p class="card-text">
             @Html.Raw(Model.Continut)
         </p>
         <hr />
@@ -72,7 +81,9 @@
                 {
                     <form asp-controller="Likes" asp-action="Click" asp-route-id="@Model.Id" method="post">
                         <div>
-                            <button class="btn btn-primary bi bi-heart fs-5" type="submit" id="@Model.Id"> @Model.NrLikes</button>
+                            <button class="btn btn-primary bi bi-heart fs-5 like" type="submit" id="@Model.Id"> @Model.NrLikes</button>
+                            <input type="hidden" name="url" value="@($"{Context.Request.Path}{Context.Request.QueryString}")"/>
+
                         </div>
                     </form>
 

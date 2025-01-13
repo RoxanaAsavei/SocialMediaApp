@@ -16,10 +16,13 @@
 		<div class="d-flex flex-column justify-content-center align-items-center" style="gap: 20px; padding-bottom: 20px;">
 		@foreach (var follow in ViewBag.ToBeAccepted)
 		{
-			<div class="card w-75">
+			<div class="card w-50">
 				<div class="card-body text-center">
 					<div class="card-text">
-							<a href="/Users/Details/@follow.FollowerId" class="no-underline fw-bold">@follow.Follower.UserName</a> a cerut să te urmărească.
+							<img src="@follow.Follower.Image" class="rounded-circle" style="width: 20px; height: 20px;" />
+							<a href="/Users/Details/@follow.FollowerId" class="no-underline fw-bold">
+								@follow.Follower.FirstName @follow.Follower.LastName
+							</a> a cerut să te urmărească.
 					</div>
 				</div>
 				<div class="card-footer d-flex justify-content-around">
@@ -41,7 +44,9 @@
 		}
 		</div>
 	}
-	else 
+
+	@* verificam daca contul e privat *@
+	else if(ViewBag.Privacy == true)
 	{
 		<div>
 			<div class="card-text text-center fs-4 bi bi-person-x" style="padding-top: 10px;">
@@ -59,7 +64,10 @@
 				<div class="card w-50">
 					<div class="card-body text-center">
 						<div class="card-text">
-							<a href="/Users/Details/@follow.FollowerId" class="no-underline fw-bold">@follow.Follower.UserName</a> a început să te urmărească.
+							<img src="@follow.Follower.Image" class="rounded-circle" style="width: 20px; height: 20px;"/>
+							<a href="/Users/Details/@follow.FollowerId" class="no-underline fw-bold">
+								@follow.Follower.FirstName @follow.Follower.LastName
+							</a> a început să te urmărească.
 						</div>
 					</div>
 					<div class="card-footer bi bi-clock text-lg-end">

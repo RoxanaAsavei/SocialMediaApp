@@ -24,7 +24,7 @@ namespace SocialMediaApp.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Click(int id)
+		public IActionResult Click(int id, string url)
 		{
 			// luam id-ul userului care a dat like
 			var userId = _userManager.GetUserId(User);
@@ -50,7 +50,7 @@ namespace SocialMediaApp.Controllers
 				post.NrLikes -= 1;
 			}
 			db.SaveChanges();
-			return RedirectToAction("Index", "Posts");
+			return Redirect(url);
 		}
 
 

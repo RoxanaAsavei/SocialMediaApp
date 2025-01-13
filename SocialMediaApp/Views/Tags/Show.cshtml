@@ -1,20 +1,27 @@
 ﻿@using System.Linq
+@model SocialMediaApp.Models.Tag
+
 @{
-	ViewBag.Title = "Tag";
+    ViewData["Title"]= "Postări";
+}
+
+<div class="fs-3 fw-bold text-center">Postări cu eticheta @Model.Denumire</div>
+<hr />
+
+@if(User.IsInRole("Admin"))
+{
+    <form asp-controller="Tags" asp-action="Index" method="get">
+        <button class="btn btn-success" type="submit">
+            <i class="bi bi-arrow-left"></i>
+            Înapoi
+        </button>
+    </form>
 }
 
 
-<h2>@ViewBag.Title</h2>
 <br />
-
-<partial name="TagInfo" model=@ViewBag.Tag/>
-
-<h3>Posts with this tag:</h3>
-@if (ViewBag.Tag.Posts != null)
+@if (ViewBag.NoPosts > 0)
 {
-    <form action="/Posts/New" method="get">
-        <button type="submit" class="btn btn-outline-dark add-btn"><i class="bi bi-plus-square"></i></button>
-    </form>
 
     @foreach (var post in ViewBag.Posts)
     {
@@ -35,46 +42,16 @@
         </div>
     }
 
-    <br />
-    <br />
-
-    <div>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link" href="@ViewBag.PaginationBaseUrl1" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                @for (int i = 1; i <= ViewBag.lastPage; i++)
-                {
-                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                        <a class="page-link" href="@ViewBag.PaginationBaseUrl@i">@i</a>
-                    </li>
-                }
-
-                <li class="page-item @(ViewBag.CurrentPage == ViewBag.lastPage ? "disabled" : "")">
-                    <a class="page-link" href="@ViewBag.PaginationBaseUrl@(ViewBag.lastPage)" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <br />
-    <br />
 }
 else
 {
-    <p>No posts with this tag.</p>
+    <div class="d-flex vh-100 align-items-center justify-content-center">
+        <div class="fs-2 fw-bold">
+            <i class="bi bi-ban"></i>
+            Nu există postări cu această etichetă
+        </div>
+    </div>
+   
 }
-
-<form method="post" asp-controller="Tags" asp-action="Delete" asp-route-id="@ViewBag.Tag.Id">
-
-	<button class="btn btn-danger" type="submit">Sterge tagul</button>
-
-</form>
 
 <br />

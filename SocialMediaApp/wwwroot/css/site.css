@@ -78,7 +78,8 @@ body {
 .post-image {
     width: 250px;
     height: 200px;
-    padding-top: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .no-underline {
@@ -93,5 +94,10 @@ body {
 .p-card:hover {
     background-color: #000000;
     color: #FFFFFF;
+    cursor: pointer;
+}
+
+.groupInfo:hover {
+    transform: scale(0.98);
     cursor: pointer;
 }

@@ -1,159 +1,117 @@
-﻿@* @model SocialMediaApp.Models.Group
+﻿@model SocialMediaApp.Models.Group
 
-<h1>Detalii despre grup</h1>
-<br />
-<hr />
+<div class="fw-bold fs-3 text-center">Detalii despre grup</div>
+<div class="d-flex justify-content-center">
+    <hr style="width: 50%;" />
+</div>
+
 <br />
 
 <partial name="GroupInfo" model="Model" />
 
-<br />
-<hr />
-<div class="d-flex flex-row justify-content-between">
-    @if (ViewBag.CanDeleteGroup)
-    {
-        <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
-            <button class="btn btn-danger" type="submit">Sterge grup</button>
-        </form>
-    }
-</div>
-<hr />
-<br />
-<!-- Button to add a new post -->
-<div class="d-flex flex-row justify-content-between">
-    <a class="btn btn-primary" href="/Posts/New?groupId=@Model.Id">Adauga Postare</a>
-</div>
-<br />
-<hr />
-@if (Model?.Posts != null && Model.Posts.Any())
+
+@if (ViewBag.CanDeleteGroup)
 {
-    @foreach (var post in Model.Posts)
+    <div>
+        <div class="d-flex flex-row justify-content-between">
+            <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
+                <button class="btn btn-outline-danger bi bi-trash" type="submit"> Șterge</button>
+            </form>
+
+            <form asp-controller="Groups" asp-action="JoinRequests" asp-route-groupId="@Model.Id">
+                <button class="btn btn-outline-success bi bi-pencil-square"> Moderează</button>
+            </form>
+
+            <form method="get" asp-controller="Groups" asp-action="Edit" asp-route-id="@Model.Id">
+                <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editează</button>
+            </form>
+        </div>
+        <hr />
+
+    </div>
+
+}
+
+
+
+@if (ViewBag.CanDeleteGroup || ViewBag.IsMember)
+{
+    <div class="d-flex flex-row justify-content-center" style="gap: 5rem;">
+        <a class="btn btn-primary bi bi-plus-lg" href="/Posts/New?groupId=@Model.Id"> Postează</a>
+        <a class="btn btn-success bi bi-people" href="/Groups/UsersinGroup/@Model.Id"> Membri</a>
+        @if(!ViewBag.CanDeleteGroup) 
+        {
+            <form action="/Groups/Leave/@Model.Id" method="post">
+                <button class="btn btn-outline-danger bi bi-box-arrow-left" type="submit"> Ieși din grup</button>
+            </form>
+        }
+    </div>
+    <br />
+
+    <div class="text-center fs-4 fw-bold">Postări</div>
+    <hr />
+    @if (Model.Posts != null)
     {
-        <div class="card mb-3">
-            <div class="card-body">
-                <p>@post.Continut</p>
-                <small>@post.Data</small>
-                <strong><i class="bi bi-person">@post.UserId</i></strong>
-                <br />
-                <a href="/Posts/Show/@post.Id">Vezi mai multe detalii despre postare</a>
-                <br />
-                <div class="d-flex justify-content-center gap-5">
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
+        @foreach (var post in Model.Posts)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <partial name="PostInfo" model="post" />
+                    <br />
+                    <div class="d-flex justify-content-center gap-5">
                         <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
                             <button type="submit" class="btn btn-info">Vezi mai mult</button>
                         </form>
-                    }
-                    else
-                    {
-                        <form action="/Home/Index" method="get" class="d-inline-block">
-                            <button type="submit" class="btn btn-info">Vezi mai mult</button>
-                        </form>
-                    }
-
-                    @if (ViewBag.UserCurent == post.UserId)
-                    {
-                        <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
-                            <button type="submit" class="btn btn-info">Editează</button>
-                        </form>
-                    }
+                        @if(ViewBag.userId == post.UserId)
+                        {
+                            <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
+                                <button type="submit" class="btn btn-info">Editează</button>
+                            </form>
+                        }
+                    </div>
                 </div>
+
             </div>
-        </div>
+        }
     }
-}
-else
-{
-    <p>No posts available.</p>
-}
-
-<button type="submit"> <a href="/Groups/UsersinGroup/@Model.Id">Vizualizeaza toti utilizatorii din grup</a></button>
-<br />
-<br />
-@if (User.IsInRole("Moderator") || User.IsInRole("Admin"))
-{
-    <a asp-action="JoinRequests" asp-route-groupId="@Model.Id" class="btn btn-primary">View Join Requests</a>
-}
-<br />
-<br />
-<button type="submit"> <a href="/Groups/Index">Inapoi</a></button> *@
-
-@model SocialMediaApp.Models.Group
-
-<h1>Detalii despre grup</h1>
-<br />
-<hr />
-<br />
-
-<partial name="GroupInfo" model="Model" />
-
-<br />
-<hr />
-<div class="d-flex flex-row justify-content-between">
-    @if (ViewBag.CanDeleteGroup)
+    else
     {
-        <form method="post" asp-controller="Groups" asp-action="Delete" asp-route-id="@Model.Id">
-            <button class="btn btn-danger" type="submit">Sterge grup</button>
-        </form>
+        <p>No posts available.</p>
     }
-</div>
-<hr />
-<br />
-<!-- Button to add a new post -->
-<div class="d-flex flex-row justify-content-between">
-    <a class="btn btn-primary" href="/Posts/New?groupId=@Model.Id">Adauga Postare</a>
-</div>
-<br />
-<hr />
-@if (Model?.Posts != null && Model.Posts.Any())
-{
-    @foreach (var post in Model.Posts)
-    {
-        <div class="card mb-3">
-            <div class="card-body">
-                <p class="card-text">@post.Continut</p>
-                <small class="text-muted">@post.Data.ToString("MMMM dd, yyyy")</small>
-                <strong class="d-block"><i class="bi bi-person"></i> @post.UserId</strong>
-                <br />
-                <div class="d-flex justify-content-center gap-3 mt-3">
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        <form action="/Posts/Show/@post.Id" method="get" class="d-inline-block">
-                            <button type="submit" class="btn btn-info">Vezi mai mult</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form action="/Home/Index" method="get" class="d-inline-block">
-                            <button type="submit" class="btn btn-info">Vezi mai mult</button>
-                        </form>
-                    }
 
-                    @if (ViewBag.UserCurent == post.UserId)
-                    {
-                        <form action="/Posts/Edit/@post.Id" method="get" class="d-inline-block">
-                            <button type="submit" class="btn btn-warning">Editează</button>
-                        </form>
-                    }
-                </div>
+}
+
+else 
+{
+    <div class="d-flex justify-content-center">
+        @if (ViewBag.JoinRequest)
+        {
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary bi bi-send" disabled> Cererea a fost trimisă</button>
+                <form action="/Groups/Leave/@Model.Id" method="post">
+                    <button class="btn btn-outline-danger bi bi-trash3" type="submit"> Anulează</button>
+                </form>
+
             </div>
-        </div>
-    }
-}
-else
-{
-    <p>No posts available.</p>
+
+        }
+
+        else
+        {
+            <form action="/Groups/Join/@Model.Id" method="post" class="d-inline-block">
+                <button class="btn btn-outline-primary bi bi-person-plus" type="submit"> Alătură-te</button>
+            </form>
+        }
+    </div>
+
+
 }
 
-<button type="submit"> <a href="/Groups/UsersinGroup/@Model.Id">Vizualizeaza toti utilizatorii din grup</a></button>
 <br />
 <br />
-@if (User.IsInRole("Moderator") || User.IsInRole("Admin"))
-{
-    <a asp-action="JoinRequests" asp-route-groupId="@Model.Id" class="btn btn-primary">View Join Requests</a>
-}
-<br />
-<br />
-<button type="submit"> <a href="/Groups/Index">Inapoi</a></button>
+
+<form>
+    <button class="btn btn-success bi bi-arrow-left" type="submit"> Înapoi</button>
+</form>
 
 

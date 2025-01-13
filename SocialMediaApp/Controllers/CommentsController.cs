@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using SocialMediaApp.Data;
@@ -6,8 +7,9 @@ using SocialMediaApp.Models;
 
 namespace SocialMediaApp.Controllers
 {
+	[Authorize(Roles = "User,Admin")]
 	public class CommentsController : Controller
-	{
+	{	
 		private readonly ApplicationDbContext db;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;

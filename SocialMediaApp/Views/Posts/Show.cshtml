@@ -1,6 +1,9 @@
 ﻿@model SocialMediaApp.Models.Post
 
-<h1>Detalii postare</h1>
+@{
+    ViewData["Title"] = "Postare";
+}
+
 <br />
 <partial name="PostInfo" model="Model" />
 <br />
@@ -12,34 +15,45 @@
 
         <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.Id">
 
-            <button class="btn btn-outline-danger bi bi-trash" type="submit"> Sterge postarea</button>
+            <button class="btn btn-outline-danger bi bi-trash" type="submit"> Șterge</button>
 
         </form>
 
-        <form action="/Posts/Edit/@Model.Id" method="get" class="d-inline-block">
 
-            <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editeaza postarea</button>
+        @if (ViewBag.UserCurent == Model.UserId)
+        {
+            <form action="/Posts/Edit/@Model.Id" method="get" class="d-inline-block">
 
-        </form>
+                <button class="btn btn-outline-primary bi bi-pencil-square" type="submit"> Editează</button>
+
+            </form>
+        }
 
     </div>
 }
 
+
 <br />
 <hr />
-<br />
 @* @if (Model?.Comments != null && Model.Comments.Any()) *@
 <div>
-    <h3>Comentarii</h3>
+    <h3 class="fw-bold">Comentarii</h3>
+    <br />
     @try
     {
-        @foreach (var comm in Model.Comments)
+        @foreach (var comm in ViewBag.Comms)
         {
             <div class="container">
                 <div class="row">
                     <div class="card col-md-8 border border-1 border-secondary rounded-1 mx-auto">
                         <div class="card-header">
-                            <strong><i class="bi bi-person"> <a href="/Users/Details/@comm.UserId" class="no-underline">@comm.User.UserName</a></i></strong>
+                            <div class="fw-bold">
+                                <img src="@comm.User.Image" class="rounded-circle" style="width: 30px; height: 30px;"/>
+                                <a href="/Users/Details/@comm.UserId" class="no-underline">
+                                @comm.User.FirstName @comm.User.LastName
+                                </a>
+
+                            </div>
                         </div>
                         <div class="card-body">
 
@@ -50,20 +64,23 @@
 
                         @if(ViewBag.UserCurent == comm.UserId || ViewBag.EsteAdmin == true) {
                             <div class="d-flex gap-3">
+                                @if (ViewBag.UserCurent == comm.UserId)
+                                {
+                                    <div>
 
-                                <div>
+                                        <a class="btn btn-outline-primary" asp-controller="Comments" asp-action="Edit" asp-route-id="@comm.Id">
+                                            <i class="bi bi-pencil-square"></i> Editează
+                                        </a>
 
-                                    <a class="btn btn-outline-primary" asp-controller="Comments" asp-action="Edit" asp-route-id="@comm.Id">
-                                        <i class="bi bi-pencil-square"></i> Editeaza
-                                    </a>
+                                    </div>
+                                }
 
-                                </div>
 
                                 <div>
 
                                     <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comm.Id">
 
-                                        <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Sterge</button>
+                                        <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i> Șterge</button>
 
                                     </form>
 
@@ -104,7 +121,7 @@
 
                         <input type="hidden" name="PostId" value="@Model.Id" />
 
-                        <label>Continut comentariu</label>
+                        <label>Conținut comentariu</label>
                         <br />
 
                         <textarea class="form-control" name="Continut"></textarea>
@@ -115,7 +132,7 @@
                         <div class="d-flex justify-content-end">
                             <button class="btn btn-outline-success" type="submit">
                                 <i class="bi bi-plus-lg"></i>
-                                Posteaza
+                                Postează
                             </button>
                         </div>
                     </div>
@@ -133,7 +150,7 @@
 {
     <form action="/Groups/Show/@Model.GroupId">
         <button class="btn btn-outline-dark" type="submit">
-            <i class="bi bi-arrow-left"></i> Inapoi
+            <i class="bi bi-arrow-left"></i> Înapoi
         </button>
     </form>
 }
@@ -141,7 +158,7 @@ else
 {
     <form action="/Posts/Index">
         <button class="btn btn-outline-dark" type="submit">
-            <i class="bi bi-arrow-left"></i> Inapoi
+            <i class="bi bi-arrow-left"></i> Înapoi
         </button>
     </form>
 }

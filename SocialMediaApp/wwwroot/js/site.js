@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    var groupInfos = document.querySelectorAll('.groupInfo');
+    groupInfos.forEach(function (card) {
+        card.addEventListener('click', function () {
+            var groupId = this.getAttribute('data-group-id');
+            window.location.href = 'Groups/Show/' + groupId;
+        });
+    });
+
+ 
 
     function toggleHeartClass(elementId) {
         var element = document.getElementById(elementId);

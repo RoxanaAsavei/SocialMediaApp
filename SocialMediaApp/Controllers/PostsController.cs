@@ -1,6 +1,7 @@
 ﻿using Ganss.Xss;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,9 +11,11 @@ using SocialMediaApp.Data;
 using SocialMediaApp.Models;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace SocialMediaApp.Controllers
 {
+	[Authorize(Roles = "User,Admin")]
 	public class PostsController : Controller
 	{
         private readonly ApplicationDbContext db;
@@ -20,7 +23,8 @@ namespace SocialMediaApp.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
-        public PostsController(
+	
+		public PostsController(
         ApplicationDbContext context,
 		IWebHostEnvironment env,
 		UserManager<ApplicationUser> userManager,
@@ -36,8 +40,8 @@ namespace SocialMediaApp.Controllers
         }
         public IActionResult Index()
         {
-            // daca nu e signed in, luam postarile persoanelor care au cont public
-            var postari = db.Posts.Include("Comments")
+			// daca nu e signed in, luam postarile persoanelor care au cont public
+			var postari = db.Posts.Include("Comments")
                         .Include("Tag")
                         .Include("User")
                         .Where(p => p.User.Privacy == false && p.GroupId == null) // Exclude posts with a non-null GroupId
@@ -53,7 +57,7 @@ namespace SocialMediaApp.Controllers
                     postari = db.Posts.Include("Comments")
                         .Include("Tag")
                         .Include("User")
-                        .Where(p => p.GroupId == null) // Exclude posts with a non-null GroupId
+                        .Where(p => p.GroupId == null)
                         .OrderByDescending(a => a.Data);
                 }
                 else
@@ -127,13 +131,16 @@ namespace SocialMediaApp.Controllers
 						.Include("Comments.User")
 						.Where(post => post.Id == id)
 						.First();
+			ViewBag.Comms = db.Comments
+										.Include("User")
+										.Where(c => c.PostId == id)
+										.OrderByDescending(c => c.Data);
 			SetAccessRights();
 			return View(post);
 		}
 
 
         // adaugarea unui comentariu din formular
-        [Authorize(Roles = "User,Moderator,Admin")]
         [HttpPost]
 		public IActionResult Show([FromForm] Comment comment)
 		{
@@ -192,6 +199,10 @@ namespace SocialMediaApp.Controllers
 		public async Task<IActionResult> Edit(int id, Post requestPost, IFormFile? Image)
 		{
 			var sanitizer = new HtmlSanitizer();
+			sanitizer.AllowedTags.Add("iframe");
+			sanitizer.AllowedTags.Add("img");
+			sanitizer.AllowedAttributes.Add("src");
+			sanitizer.AllowedAttributes.Add("alt");
 			Post post = await db.Posts.FindAsync(id);
             if (!(post.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin")))
 			{
@@ -215,7 +226,10 @@ namespace SocialMediaApp.Controllers
 				post.Data = DateTime.Now;
 				post.TagId = requestPost.TagId;
 				post.Locatie = requestPost.Locatie;
-				post.Video = requestPost.Video;
+				//if(requestPost.Video != null)
+				//{
+				//		post.Video = GetYouTubeVideoId(post.Video);
+				//}	
 
 				if (Image != null)
 				{
@@ -284,16 +298,15 @@ namespace SocialMediaApp.Controllers
 			post.NrLikes = 0;
 			post.UserId = _userManager.GetUserId(User);
 
+			//if(post.Video != null)
+			//{
+
+			//	post.Video = GetYouTubeVideoId(post.Video);
+			//}
+
 			if (string.IsNullOrEmpty(post.UserId))
 			{
 				ModelState.AddModelError("UserId", "Unable to determine the user ID.");
-				post.Tags = GetAllTags();
-				return View(post);
-			}
-
-			if (post.TagId == null)
-			{
-				ModelState.AddModelError("TagId", "Tag is required.");
 				post.Tags = GetAllTags();
 				return View(post);
 			}
@@ -383,5 +396,12 @@ namespace SocialMediaApp.Controllers
 			ViewBag.UserCurent = _userManager.GetUserId(User);
 			ViewBag.EsteAdmin = User.IsInRole("Admin");
 		}
+
+		//private static string GetYouTubeVideoId(string url)
+		//{
+		//	var regex = new Regex(@"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})");
+		//	var match = regex.Match(url);
+		//	return match.Success ? match.Groups[1].Value : string.Empty;
+		//}
 	}
 }

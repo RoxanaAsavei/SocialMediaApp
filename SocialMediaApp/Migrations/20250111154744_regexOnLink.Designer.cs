@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaApp.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaApp.Data;
 namespace SocialMediaApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111154744_regexOnLink")]
+    partial class regexOnLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -313,18 +316,36 @@ namespace SocialMediaApp.Migrations
                     b.Property<string>("Fotografie")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ModeratorId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Nume")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ModeratorId");
-
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GroupModerators");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Join", b =>
@@ -551,13 +572,19 @@ namespace SocialMediaApp.Migrations
                     b.Navigation("Follower");
                 });
 
-            modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
+            modelBuilder.Entity("SocialMediaApp.Models.GroupModerator", b =>
                 {
-                    b.HasOne("SocialMediaApp.Models.ApplicationUser", "Moderator")
-                        .WithMany("ModeratedGroups")
-                        .HasForeignKey("ModeratorId");
+                    b.HasOne("SocialMediaApp.Models.Group", "Group")
+                        .WithMany("Moderators")
+                        .HasForeignKey("GroupId");
 
-                    b.Navigation("Moderator");
+                    b.HasOne("SocialMediaApp.Models.ApplicationUser", "User")
+                        .WithMany("ModeratedGroups")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SocialMediaApp.Models.Join", b =>
@@ -668,6 +695,8 @@ namespace SocialMediaApp.Migrations
 
             modelBuilder.Entity("SocialMediaApp.Models.Group", b =>
                 {
+                    b.Navigation("Moderators");
+
                     b.Navigation("Posts");
 
                     b.Navigation("UserGroups");
